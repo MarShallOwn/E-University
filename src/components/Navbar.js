@@ -6,6 +6,7 @@ import Axios from 'axios'
 const Navbar = props => {
 
     const setLoggedIn = useLoggedIn()
+    const user = useUser()
 
     const logout = () => {
         Axios.get('/api/logout', {withCredentials: true})
@@ -26,9 +27,13 @@ const Navbar = props => {
           <li>
             <Link to="/contact-us">Contact Us</Link>
           </li>
-          <li>
-            <Link to="/create-user">Create User</Link>
-          </li>
+          {
+            user && user.isAdmin &&
+            <li>
+              <Link to="/create-user">Create User</Link>
+            </li>
+          }
+
           <li>
             <Link to="/register">Register</Link>
           </li>

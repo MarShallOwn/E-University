@@ -47,7 +47,9 @@ const CreateUser = props => {
             {_.get("faculty.type", errors) === "required" && (
                 <p>This field is required</p>
             )}
-            <TextField name="level" id="level" label="Level" inputRef={register({
+            <TextField type="number" name="level" id="level" label="Level" onInput = {(e) =>{
+        e.target.value = Math.max(0, parseInt(e.target.value) ).toString().slice(0,1)
+    }} inputRef={register({
                 required: true,
             })} required />
             {_.get("level.type", errors) === "required" && (

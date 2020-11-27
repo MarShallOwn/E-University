@@ -27,9 +27,18 @@ const userSchema = new Schema({
         type: String,
         default: 'default.png'
     },
-    department: String,
+    department: {
+        type: String,
+        required: true
+    },
+    isAdmin: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     isProf: {
         type: Boolean,
+        required: true,
         default: false
     },
     nationalID: {
