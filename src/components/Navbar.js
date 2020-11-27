@@ -1,12 +1,17 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
+import { useLoggedIn, useUser } from '../contexts/UserProvider'
 import Axios from 'axios'
 
 const Navbar = props => {
 
-    const logout = () => {
+    const setLoggedIn = useLoggedIn()
 
+    const logout = () => {
         Axios.get('/api/logout', {withCredentials: true})
+        .then(res => {
+          setLoggedIn(false)
+        })
     }
 
     return(
@@ -38,4 +43,4 @@ const Navbar = props => {
     )
 }
 
-export default Navbar
+export default withRouter(Navbar)

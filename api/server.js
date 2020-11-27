@@ -166,7 +166,13 @@ app.get('/api/user', (req, res) => {
         user = {firstname, lastname, email, city, phoneNumber, picture, department, isProf, faculty, level}
     }
 
-    res.send({user})
+    if(user){
+        return res.send({pass: true, user})
+    }
+    else{
+        return res.send({pass: false})
+    }
+
 })
 
 /**
