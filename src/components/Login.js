@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import _ from 'lodash/fp'
 import {Grid, TextField, Button} from '@material-ui/core'
-import { useUser } from '../contexts/UserProvider'
+import { useUser, useLoggedIn } from '../contexts/UserProvider'
 import { useForm } from 'react-hook-form'
 import Axios from 'axios'
 
 const Login = props => {
 
     const user = useUser()
+    const setLoggedIn = useLoggedIn()
 
     useEffect(() => {
         user && props.history.push("/")
@@ -25,7 +26,14 @@ const Login = props => {
         {
             withCredentials: true
         })
-        .then(res => res.data.pass ? props.history.push('/') : setShowError({error: true, reason: 'email or password not correct'}))
+        .then(res => {
+            if( res.data.pass ){
+                setLoggedIn(true)
+                props.history.push('/')
+            }else{
+                setShowError({error: true, reason: 'email or password not correct'})
+            }
+        })
     }
 
     return(
