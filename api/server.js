@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 const passport = require('passport')
 const bodyParser = require('body-parser')
 const session = require('express-session')
-const sanitize = require('mongo-sanitize')
 const initalizePassport = require('./passport-config')
 const userModel = require('./models/Users')
 const server = http.createServer(app)
@@ -55,11 +54,6 @@ const checkNotAuthenticated = (req, res, next) => {
 app.post('/api/storeUser', async (req, res) => {
     const {firstname, lastname, nationalID, faculty, level, department} = req.body.data
 
-    /**
-     * Sanitize user input first
-     */
-    nationalID = sanitize(nationalID)
-
     if(await userModel.findOne({nationalID})){
         return res.send({status: 404, message: 'user already registered !'})
     }
@@ -83,11 +77,6 @@ app.post('/api/storeUser', async (req, res) => {
 app.post('/api/registerUser', (req, res) => {
 
     const {nationalID} = req.body.data
-
-    /**
-     * Sanitize user input first
-     */
-    nationalID = sanitize(nationalID)
 
     userModel.findOne({nationalID}, (err, user) => {
 
@@ -113,11 +102,6 @@ app.post('/api/continueRegister', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
-
-    /**
-     * Sanitize user input first
-     */
-    nationalID = sanitize(nationalID)
     
     userModel.findOne({nationalID}, (err, user) => {
         if(!err && !user.email){
@@ -162,8 +146,8 @@ app.get('/api/failure', (req, res) => {
 app.get('/api/user', (req, res) => {
     let user;
     if(req.user){
-        const {firstname, lastname, email, city, phoneNumber, picture, department, isProf, faculty, level} = req.user
-        user = {firstname, lastname, email, city, phoneNumber, picture, department, isProf, faculty, level}
+        const {firstname, lastname, email, city, phoneNumber, picture, department, isAdmin, isProf, faculty, level} = req.user
+        user = {firstname, lastname, email, city, phoneNumber, picture, department, isAdmin, isProf, faculty, level}
     }
 
     if(user){
