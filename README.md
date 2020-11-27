@@ -34,9 +34,8 @@ You will need the following things properly installed on your computer.
 * `open two terminals`
 * `first terminal you (cd api) -for the backend-`
 * `the second terminal you will stay in the same dir -for the frontend-`
-* `in the api terminal run (npm i) to download the dependencies`
-* `in the client terminal also run (npm i) to download the dependencies`
-* `./frontend npm install`
+* `in the api terminal run (npm i) to install the dependencies`
+* `in the client terminal also run (npm i) to install the dependencies`
 
 ## Running / Development
 * `to run the backend server go to api terminal and run (npm run dev) for development running on ` [http://localhost:8080](http://localhost:8080)
