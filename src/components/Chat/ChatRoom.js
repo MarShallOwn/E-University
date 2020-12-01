@@ -51,9 +51,7 @@ const ChatRoom = (props) => {
             height: "75px",
             borderRadius: "50%",
           }}
-          src={
-            "https://www.awn.com/sites/default/files/styles/original/public/image/attached/1025539-pikachu.png?itok=n20SjGLV"
-          }
+          src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${picture}`}
         />
         <h2 style={{ display: "inline-block" }}>{displayname}</h2>
       </div>
