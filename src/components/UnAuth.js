@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Redirect, Route, useLocation } from "react-router-dom";
+import { Redirect, Route } from "react-router-dom";
 import { useUser } from "../contexts/UserProvider";
 
-const Auth = ({ component: Component, ...rest }) => {
+const UnAuth = ({ component: Component, ...rest }) => {
   const user = useUser();
-
-  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState(false);
@@ -29,10 +27,7 @@ const Auth = ({ component: Component, ...rest }) => {
         <Route
           {...rest}
           render={(props) =>
-            auth ? <Component {...props} /> : <Redirect to={{
-                pathname: '/login',
-                search: `?next=${location.pathname}`
-            }} />
+            auth ? <Redirect to='/' /> : <Component {...props} /> 
           }
         />
       )}
@@ -40,4 +35,4 @@ const Auth = ({ component: Component, ...rest }) => {
   );
 };
 
-export default Auth;
+export default UnAuth;
