@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const bodyParser = require("body-parser");
 const session = require("express-session");
+const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
@@ -26,6 +27,35 @@ cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
+});
+
+// Profile Images
+const storage = multer.diskStorage({
+  filename: (req, file, cb) => {
+    const ext = file.originalname.split(".")[
+      file.originalname.split(".").length - 1
+    ];
+    const imageFileName = `${uuidv4()}`;
+    cb(null, imageFileName);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  console.log("check");
+  if (
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg"
+  ) {
+    cb(null, true);
+  }
+  cb(null, false);
+};
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5000000 },
+  fileFilter,
 });
 
 mongoose.connect(process.env.DATABASE, {

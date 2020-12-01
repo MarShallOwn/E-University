@@ -25,7 +25,7 @@ const userSchema = new Schema({
     phoneNumber: String,
     picture: {
         type: String,
-        default: 'default.png'
+        default: 'chat-app-profile-pictures/default-image_qtdxwi'
     },
     department: {
         type: String,
