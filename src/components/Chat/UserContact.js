@@ -39,10 +39,14 @@ const UserContact = (props) => {
    */
   const [searchedUser, setSearchedUser] = useState(initUser);
 
-  useEffect(() => {
+  const getContacts = () => {
     Axios.get("/api/contacts", { withCredentials: true }).then((res) => {
       setContacts(res.data);
     });
+  };
+
+  useEffect(() => {
+      getContacts()
   }, []);
 
   /**
@@ -84,6 +88,7 @@ const UserContact = (props) => {
       }
     ).then((res) => {
       if ((room && room._id) !== res.data.room._id) {
+        getContacts();
         socket.emit("create", res.data.room._id);
         setRoom(null);
         setRoom(res.data.room);
@@ -130,12 +135,10 @@ const UserContact = (props) => {
       <div style={{ marginBottom: "20px" }} id="profile-mini-card">
         <img
           style={{ height: "2rem" }}
-          src={
-            "https://www.awn.com/sites/default/files/styles/original/public/image/attached/1025539-pikachu.png?itok=n20SjGLV"
-          }
+          src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${user.picture}`}
         />
         <h4 style={{ display: "inline-block" }}>
-          { user && `${user.firstname} ${user.lastname}`}
+          {user && `${user.firstname} ${user.lastname}`}
         </h4>
       </div>
       <div id="input-section">
