@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Axios from "axios";
-import { set } from "lodash";
 
 const context = createContext();
 const loginContext = createContext();
@@ -24,7 +23,9 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     Axios.get("/api/user", { withCredentials: true })
       .then((res) => {
+        !res.data.pass && setLoggedIn(false)
         if(res.data.pass){
+          setLoggedIn(true)
           setUser(res.data.user)
         }
         else if(!loggedIn){
@@ -34,6 +35,7 @@ export const UserProvider = ({ children }) => {
       .catch((err) => {
         console.log(err);
       });
+      
   }, [loggedIn]);
 
   return (

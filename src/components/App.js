@@ -1,6 +1,6 @@
 import React from "react";
 import {Grid} from '@material-ui/core';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 //import { createBrowserHistory } from 'history'
 import Home from './Home';
 import About from './About';
@@ -9,6 +9,8 @@ import CreateUser from './CreateUser';
 import Register from "./Register";
 import ContinueRegister from "./ContinueRegister";
 import RegisterComplete from "./RegisterComplete";
+import Auth from './Auth';
+import Chat from './Chat/Chat';
 import { UserProvider }  from '../contexts/UserProvider';
 import Login from "./Login";
 import Navbar from "./Navbar";
@@ -32,6 +34,7 @@ const App = () => {
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
             <Route path="/register-complete" render={ props => <RegisterComplete {...props} />} />
             <Route path="/login" render={ props => <Login {...props} />} />
+            <Auth path="/chat" component={Chat} />
           </Switch>
         </UserProvider>
     </Router>
