@@ -12,7 +12,7 @@ const Login = props => {
 
     useEffect(() => {
         if(user){
-            props.location.search ? props.history.push(props.location.search.split('=')[1]) : props.history.push("/")
+            props.location.search && props.history.push(props.location.search.split('=')[1])
         }
     }, [user, props.history, props.location.search])
 

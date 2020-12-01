@@ -135,7 +135,7 @@ const UserContact = (props) => {
           }
         />
         <h4 style={{ display: "inline-block" }}>
-          {`${user.firstname} ${user.lastname}`}
+          { user && `${user.firstname} ${user.lastname}`}
         </h4>
       </div>
       <div id="input-section">
@@ -157,7 +157,7 @@ const UserContact = (props) => {
         <button onClick={handleSubmit(emailSearchHandle)}>Search</button>
       </div>
       <div id="users">{renderResult}</div>
-      <p style={{ marginTop: "20%" }}>UserName: {user.email}</p>
+      <p style={{ marginTop: "20%" }}>UserName: {user && user.email}</p>
     </Grid>
   );
 };
