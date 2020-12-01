@@ -11,8 +11,10 @@ const Login = props => {
     const setLoggedIn = useLoggedIn()
 
     useEffect(() => {
-        user && props.history.push("/")
-    }, [user, props.history])
+        if(user){
+            props.location.search ? props.history.push(props.location.search.split('=')[1]) : props.history.push("/")
+        }
+    }, [user, props.history, props.location.search])
 
     const [showError, setShowError] = useState({error: false, reason: null})
 
@@ -29,7 +31,7 @@ const Login = props => {
         .then(res => {
             if( res.data.pass ){
                 setLoggedIn(true)
-                props.history.push('/')
+                props.location.search ? props.history.push(props.location.search.split('=')[1]) : props.history.push("/")
             }else{
                 setShowError({error: true, reason: 'email or password not correct'})
             }

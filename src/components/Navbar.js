@@ -27,22 +27,32 @@ const Navbar = props => {
           <li>
             <Link to="/contact-us">Contact Us</Link>
           </li>
+          <li>
+            <Link to="/chat">Chat</Link>
+          </li>
           {
             user && user.isAdmin &&
             <li>
               <Link to="/create-user">Create User</Link>
             </li>
           }
-
-          <li>
-            <Link to="/register">Register</Link>
-          </li>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-          <li>
-            <button onClick={logout}>Logout</button>
-          </li>
+          {
+            !user &&
+            <>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+            </>
+          }
+          {
+            user &&
+            <li>
+              <button onClick={logout}>Logout</button>
+            </li>
+          }
         </ul>
       </nav>
     )
