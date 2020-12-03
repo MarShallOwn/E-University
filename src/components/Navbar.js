@@ -49,9 +49,14 @@ const Navbar = props => {
           }
           {
             user &&
+            <>
+            <li>
+              <Link to="/profile">Profile</Link>
+            </li>
             <li>
               <button onClick={logout}>Logout</button>
             </li>
+            </>
           }
         </ul>
       </nav>

@@ -15,6 +15,7 @@ import { UserProvider }  from '../contexts/UserProvider';
 import Login from "./Login";
 import Navbar from "./Navbar";
 import UnAuth from "./UnAuth";
+import Profile from "./Profile";
 
 //const history = createBrowserHistory()
 
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/register-complete" render={ props => <RegisterComplete {...props} />} />
             <UnAuth path="/login" component={Login} />
             <Auth path="/chat" component={Chat} />
+            <Auth path="/profile" component={Profile} />
           </Switch>
         </UserProvider>
     </Router>
