@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { useUser } from "../../contexts/UserProvider";
 import Axios from "axios";
 import Messages from "./Messages";
@@ -15,7 +15,7 @@ const ChatRoom = (props) => {
     return () => {
       socket.emit("leaveRoom", room._id);
     };
-  }, []);
+  }, [socket, room]);
 
   const msgInputHandler = (e) => {
     setMessage(e.target.value);
@@ -37,7 +37,7 @@ const ChatRoom = (props) => {
     }
   };
 
-  const { displayname, picture } = room.participants.find(
+  const { displayname, picture, isProf } = room.participants.find(
     (participant) => participant.email !== user.email
   );
 
@@ -53,7 +53,10 @@ const ChatRoom = (props) => {
           }}
           src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${picture}`}
         />
-        <h2 style={{ display: "inline-block" }}>{displayname}</h2>
+        <h2 style={{ display: "inline-block" }}>
+          {displayname}{" "}
+          {isProf && <span style={styles.professorContainer}>Professor</span>}
+        </h2>
       </div>
       <Messages socket={socket} room={room} />
       <div id="chat-input">
@@ -77,3 +80,13 @@ const ChatRoom = (props) => {
 };
 
 export default ChatRoom;
+
+const styles = {
+  professorContainer: {
+    color: "white",
+    fontWeight: "bold",
+    backgroundColor: "purple",
+    padding: ".2rem",
+    borderRadius: "5px",
+  },
+};

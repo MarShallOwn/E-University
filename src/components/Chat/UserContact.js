@@ -1,23 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Grid, TextField } from "@material-ui/core";
+import React, { useState } from "react";
+import { Grid, TextField, InputAdornment } from "@material-ui/core";
 import _ from "lodash/fp";
 import { useUser } from "../../contexts/UserProvider";
 import { useForm } from "react-hook-form";
+import { MdClear } from "react-icons/md";
 import Axios from "axios";
 
-const initUser = {
-  displayname: null,
-  email: null,
-  city: null,
-  phoneNumber: null,
-  picture: null,
-  department: null,
-  faculty: null,
-  level: null,
-};
-
 const UserContact = (props) => {
-  const { socket, setRoom, room } = props;
+  const { openRoom, contacts } = props;
 
   const user = useUser();
   const { register, handleSubmit, errors } = useForm();
@@ -30,24 +20,9 @@ const UserContact = (props) => {
   };
 
   /**
-   * User's Contacts List
-   */
-  const [contacts, setContacts] = useState([]);
-
-  /**
    * Store searched user
    */
   const [searchedUser, setSearchedUser] = useState(initUser);
-
-  const getContacts = () => {
-    Axios.get("/api/contacts", { withCredentials: true }).then((res) => {
-      setContacts(res.data);
-    });
-  };
-
-  useEffect(() => {
-      getContacts()
-  }, []);
 
   /**
    * @param {*} e
@@ -64,7 +39,7 @@ const UserContact = (props) => {
    * Search for User using email and return it to be saved in state
    */
   const emailSearchHandle = (data) => {
-    if (data.emailSearch !== "") {
+    if (data.emailSearch !== "" && data.emailSearch !== user.email) {
       Axios.get(`/api/chat/search?email=${data.emailSearch}`, {
         withCredentials: true,
       }).then((res) => {
@@ -74,36 +49,18 @@ const UserContact = (props) => {
   };
 
   /**
-   * @param {*} e
-   * Open Chat room for the selected User
-   */
-  const openRoom = (e) => {
-    Axios.post(
-      "/api/chat/room",
-      {
-        email: e.target.id,
-      },
-      {
-        withCredentials: true,
-      }
-    ).then((res) => {
-      if ((room && room._id) !== res.data.room._id) {
-        getContacts();
-        socket.emit("create", res.data.room._id);
-        setRoom(null);
-        setRoom(res.data.room);
-      }
-    });
-  };
-
-  /**
    * List the Searched User
    */
-  const renderSearchedEmail = (
-    <p onClick={openRoom} id={searchedUser.email}>
-      {searchedUser.displayname}
-      {searchedUser.email}
-    </p>
+  const renderSearchedEmail = searchedUser.email && (
+    <Grid onClick={openRoom} id={searchedUser.email} style={styles.tab}>
+      <p>
+        {searchedUser.displayname}{" "}
+        {searchedUser.isProf && (
+          <span style={styles.professorContainer}>Professor</span>
+        )}
+      </p>
+      <p>{searchedUser.email}</p>
+    </Grid>
   );
 
   /**
@@ -111,10 +68,20 @@ const UserContact = (props) => {
    */
   const renderContactsEmail = contacts.map((contact) => {
     return (
-      <p key={contact.email} onClick={openRoom} id={contact.email}>
-        {contact.displayname}
-        {contact.email}
-      </p>
+      <Grid
+        key={contact.email}
+        onClick={openRoom}
+        id={contact.email}
+        style={styles.tab}
+      >
+        <p>
+          {contact.displayname}{" "}
+          {contact.isProf && (
+            <span style={styles.professorContainer}>Professor</span>
+          )}
+        </p>
+        <p>{contact.email}</p>
+      </Grid>
     );
   });
 
@@ -125,22 +92,13 @@ const UserContact = (props) => {
     searchInput === "" ? renderContactsEmail : renderSearchedEmail;
 
   return (
-    <Grid>
+    <>
       {_.get("email.type", errors) === "required" && (
         <p>This field is required</p>
       )}
       {_.get("email.type", errors) === "pattern" && (
         <p>Please include an '@' in the email address and write the domain</p>
       )}
-      <div style={{ marginBottom: "20px" }} id="profile-mini-card">
-        <img
-          style={{ height: "2rem" }}
-          src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${user.picture}`}
-        />
-        <h4 style={{ display: "inline-block" }}>
-          {user && `${user.firstname} ${user.lastname}`}
-        </h4>
-      </div>
       <div id="input-section">
         <TextField
           variant="outlined"
@@ -148,21 +106,71 @@ const UserContact = (props) => {
           type="email"
           name="emailSearch"
           id="emailSearch"
+          value={searchInput}
           label="Search by E-mail"
           onChange={handleSearchInput}
           inputRef={register({
             required: true,
             pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
           })}
+          InputProps={{
+            endAdornment: (
+              <>
+                {searchInput !== "" && (
+                  <InputAdornment onClick={() => setSearchInput("")}>
+                    <MdClear
+                      fontSize="1.2rem"
+                      style={{
+                        backgroundColor: "black",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                      color="white"
+                    />
+                  </InputAdornment>
+                )}
+              </>
+            ),
+          }}
           onKeyPress={emailSearchKeyPressHandle}
           placeholder="Search for user"
         />
         <button onClick={handleSubmit(emailSearchHandle)}>Search</button>
       </div>
       <div id="users">{renderResult}</div>
-      <p style={{ marginTop: "20%" }}>UserName: {user && user.email}</p>
-    </Grid>
+    </>
   );
 };
 
 export default UserContact;
+
+const initUser = {
+  displayname: null,
+  email: null,
+  city: null,
+  phoneNumber: null,
+  picture: null,
+  department: null,
+  faculty: null,
+  level: null,
+  isProf: null,
+};
+
+const styles = {
+  tab: {
+    cursor: "pointer",
+    lineHeight: ".4rem",
+    margin: "1rem .2rem",
+    paddingLeft: ".5rem",
+    border: "1px solid black",
+    width: "75%",
+    borderRadius: "10px",
+  },
+  professorContainer: {
+    color: "white",
+    fontWeight: "bold",
+    backgroundColor: "purple",
+    padding: ".2rem",
+    borderRadius: "5px",
+  },
+};

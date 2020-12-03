@@ -18,7 +18,6 @@ const ContinueRegister = props => {
     }, [props.location.state, props.history])
 
     const registerUser = data => {
-        Object.keys(data).map(k => data[k] = typeof data[k] == 'string' ? data[k].trim() : data[k]);
         data = {...data, nationalID: props.location.state.nationalID}
         Axios.post('/api/continueRegister', {data})
         .then(res => res.data.pass ? props.history.push('/register-complete') : setShowError({error: true, reason: res.data.reason}))
