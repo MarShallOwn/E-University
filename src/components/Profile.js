@@ -7,7 +7,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import Axios from "axios";
-import { useUser } from "../contexts/UserProvider";
+import { useUser, useLoggedIn } from "../contexts/UserProvider";
 
 const useStyles = makeStyles(() => ({
   pictureContainer: {
@@ -45,6 +45,8 @@ const Profile = () => {
 
   const user = useUser();
 
+  const setLoggedIn = useLoggedIn();
+
   const classes = useStyles();
 
   const [showChangeButton, setShowChangeButton] = useState(false);
@@ -72,7 +74,10 @@ const Profile = () => {
     };
 
     Axios.post("/api/updateImage", formData, headers).then((res) => {
-      res.data.pass && setUploadImage({...uploadImage, temp: false});
+      if(res.data.pass){
+        setUploadImage({...uploadImage, temp: false});
+        setLoggedIn(false)
+      }
       setLoading(false);
     });
   };

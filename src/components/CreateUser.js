@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import _ from 'lodash/fp'
-import {Grid, TextField, Button} from '@material-ui/core'
+import {Grid, TextField, Button, FormControl, InputLabel, Select, MenuItem} from '@material-ui/core'
 import { useForm } from 'react-hook-form'
 import Axios from 'axios'
 
@@ -8,8 +8,10 @@ const CreateUser = props => {
 
     const {register, handleSubmit, errors} = useForm()
 
+    const [isProf, setIsProf] = useState(false)
+
     const storeUser = data => {
-        Object.keys(data).map(k => data[k] = typeof data[k] == 'string' ? data[k].trim() : data[k]);
+        data = {...data, isProf}
         Axios.post('/api/storeUser', {data})
         .then(res => res.data.status === 200 && props.history.push('/home'))
     }
@@ -61,6 +63,20 @@ const CreateUser = props => {
             {_.get("department.type", errors) === "required" && (
                 <p>This field is required</p>
             )}
+
+            <FormControl name="isProf" variant="filled" style={{width: '10rem', marginTop: '1.5rem'}}>
+                <InputLabel>Professor</InputLabel>
+                <Select
+                value={isProf}
+                onChange={e => setIsProf(e.target.value)}
+                displayEmpty
+                >
+                    <MenuItem value={false}>False</MenuItem>
+                    <MenuItem value={true}>True</MenuItem>
+                </Select>
+            </FormControl>
+
+            
             <Button style={{marginTop: '2rem'}} variant="contained" color="primary" onClick={handleSubmit(storeUser)}>
                 Primary
             </Button>

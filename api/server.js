@@ -122,31 +122,38 @@ const checkNotAuthenticated = (req, res, next) => {
 /**
  * data entry to add users data to the database
  */
-app.post("/api/storeUser", async (req, res) => {
-  const {
-    firstname,
-    lastname,
-    nationalID,
-    faculty,
-    level,
-    department,
-  } = req.body.data;
+app.post("/api/storeUser", checkAuthenticated, async (req, res) => {
 
-  if (await userModel.findOne({ nationalID })) {
-    return res.send({ status: 404, message: "user already registered !" });
+  if(req.user.isAdmin){
+    const {
+      firstname,
+      lastname,
+      nationalID,
+      faculty,
+      level,
+      department,
+      isProf
+    } = req.body.data;
+  
+    if (await userModel.findOne({ nationalID })) {
+      return res.send({ status: 404, message: "user already registered !" });
+    }
+  
+    const user = new userModel({
+      firstname,
+      lastname,
+      faculty,
+      nationalID,
+      level,
+      department,
+      isProf
+    });
+    await user.save();
+  
+    return res.send({ status: 200, message: "user stored!" });
   }
 
-  const user = new userModel({
-    firstname,
-    lastname,
-    faculty,
-    nationalID,
-    level,
-    department,
-  });
-  await user.save();
-
-  return res.send({ status: 200, message: "user stored!" });
+  return
 });
 
 /**
@@ -360,6 +367,7 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
               isActive,
               faculty,
               level,
+              isProf
             } = await userModel.findOne({ email: participant.email }).exec();
             const displayname = `${firstname} ${lastname}`;
             users.push({
@@ -372,6 +380,7 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
               isActive,
               faculty,
               level,
+              isProf
             });
           }
         }
@@ -381,12 +390,59 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
 });
 
 /**
+ * Get the List of all the professors that are from the same faculty as the user
+ */
+app.get("/api/professors", checkAuthenticated, (req, res) => {
+  userModel.find({isProf: true, faculty: req.user.faculty}, (err, doc) => {
+    if(doc){
+      const professors = [];
+      let professor;
+
+      for(const prof of doc){
+        if(prof.email){
+          const {
+            firstname,
+            lastname,
+            email,
+            city,
+            phoneNumber,
+            isActive,
+            picture,
+            department,
+            faculty,
+            level,
+          } = prof;
+          const displayname = `${firstname} ${lastname}`;
+          professor = {
+            displayname,
+            email,
+            city,
+            phoneNumber,
+            isActive,
+            picture,
+            department,
+            faculty,
+            level,
+          };
+  
+          professors.push(professor)
+        }
+      }
+
+      return res.send({ professors, pass: true });
+    }
+    return res.send({pass: false})
+  })
+})
+
+/**
  * get the user that is searched for
  */
 app.get("/api/chat/search", checkAuthenticated, (req, res) => {
   // will change this with exact value soon
   //const cond = req.query.username.length !== 0 ? {$regex: '^' + req.query.username, $options: 'i'} : null;
   userModel.findOne({ email: req.query.email }).exec((err, user) => {
+    let userRes;
     if (user) {
       const {
         firstname,
@@ -399,6 +455,7 @@ app.get("/api/chat/search", checkAuthenticated, (req, res) => {
         department,
         faculty,
         level,
+        isProf
       } = user;
       const displayname = `${firstname} ${lastname}`;
       userRes = {
@@ -411,6 +468,7 @@ app.get("/api/chat/search", checkAuthenticated, (req, res) => {
         department,
         faculty,
         level,
+        isProf
       };
       return res.send({ user: userRes, pass: true });
     }
@@ -423,7 +481,7 @@ app.get("/api/chat/search", checkAuthenticated, (req, res) => {
  * search for the room by participants and if it exists it opens the room and if it doesnt exists it creates a new room then opens it
  */
 app.post("/api/chat/room", checkAuthenticated, (req, res) => {
-  if (!req.user) {
+  if (!req.user && !req.body.email) {
     return;
   }
 
@@ -468,12 +526,14 @@ app.post("/api/chat/room", checkAuthenticated, (req, res) => {
                   displayname: `${req.user.firstname} ${req.user.lastname}`,
                   picture: req.user.picture,
                   isActive: req.user.isActive,
+                  isProf: req.user.isProf
                 },
                 {
                   email: otherUser.email,
                   displayname: `${otherUser.firstname} ${otherUser.lastname}`,
                   picture: otherUser.picture,
                   isActive: otherUser.isActive,
+                  isProf: otherUser.isProf
                 },
               ],
               createdAt,

@@ -9,26 +9,44 @@ const resultSchema = new Schema({
 const userSchema = new Schema({
     firstname: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     lastname: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     email: {
         type: String,
-        unique: true
+        trim: true,
+        unique: true,
+        sparse: true
     },
-    password: String,
-    street: String,
-    city: String,
-    phoneNumber: String,
+    password: {
+        type: String,
+        trim: true
+    },
+    street: {
+        type: String,
+        trim: true
+    },
+    city: {
+        type: String,
+        trim: true
+    },
+    phoneNumber: {
+        type: String,
+        trim: true
+    },
     picture: {
         type: String,
+        trim: true,
         default: 'chat-app-profile-pictures/default-image_qtdxwi'
     },
     department: {
         type: String,
+        trim: true,
         required: true
     },
     isActive: {
@@ -51,12 +69,14 @@ const userSchema = new Schema({
         maxlength: 14,
         minlength: 14,
         required: true,
+        trim: true,
         unique: true,
     },
     results: [resultSchema],
     finalResult: Number,
     faculty: {
         type: String,
+        trim: true,
         required: true
     },
     level: Number,
