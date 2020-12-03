@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
+const {v4: uuidv4} = require('uuid');
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
 const roomModel = require("./models/Rooms");
@@ -41,7 +42,6 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  console.log("check");
   if (
     file.mimetype === "image/jpeg" ||
     file.mimetype === "image/png" ||
@@ -277,6 +277,50 @@ app.get("/api/logout", (req, res) => {
 
   res.send({ status: 200, pass: true });
 });
+
+/**
+ * Update User's Profile Image
+ */
+app.post('/api/updateImage', upload.single("myFile"), checkAuthenticated, (req, res) => {
+  cloudinary.uploader.upload(req.file.path, {
+      folder: "e-university-profile-pictures",
+      use_filename: true
+  },
+  (err, result) => {
+      if(!err){
+          userModel.findOneAndUpdate({email: req.user.email}, { $set: {picture: result.public_id} }).exec((err, user) => {
+              if(!err){
+                  user.picture !== 'e-university-profile-pictures/default-image_qtdxwi' && cloudinary.uploader.destroy(user.picture.split('.')[0], (err, result) => err && console.log(err))
+                  roomModel.find(
+                      {participants: {
+                          $all: [{
+                              $elemMatch: {
+                                  email: req.user.email
+                              }
+                          }]
+                      }
+                  }).exec(async (err, rooms) => {
+                      if(rooms.length !== 0){
+                          for(const room of rooms){
+                              for(const i in room.participants){
+                                  if(room.participants[i].email === req.user.email){
+                                      room.participants[i] = {
+                                          ...room.participants[i],
+                                          picture: result.public_id,
+                                      }
+                                  }
+                              }
+                              await room.markModified('participants');
+                              await room.save();
+                          }
+                      }
+                      return res.send({result: result.public_id, pass: true})
+                  })
+              }
+          })
+      }
+  })
+})
 
 /**
  * Get the users details other than the room itself
