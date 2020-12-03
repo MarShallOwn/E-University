@@ -11,7 +11,7 @@ const Home = () => {
         <Grid>
             {
             !_.isEmpty(user) && 
-            <p>Welcome {user.firstname} {user.lastname}</p>
+            <p>Welcome {user.isProf && "Dr. "} {user.firstname} {user.lastname}</p>
             }
             Home Page
         </Grid>
