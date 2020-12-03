@@ -13,11 +13,12 @@ const ListContainer = ({ children }) => {
           src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${user.picture}`}
         />
         <h4 style={{ display: "inline-block" }}>
+          {user.isProf && "Dr. "}
           {user && `${user.firstname} ${user.lastname}`}
         </h4>
       </div>
       {children}
-      <p style={{ marginTop: "20%" }}>UserName: {user && user.email}</p>
+      <p style={{ marginTop: "20%" }}>E-mail: {user && user.email}</p>
     </Grid>
   );
 };
