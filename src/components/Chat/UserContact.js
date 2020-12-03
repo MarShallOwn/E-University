@@ -54,6 +54,7 @@ const UserContact = (props) => {
   const renderSearchedEmail = searchedUser.email && (
     <Grid onClick={openRoom} id={searchedUser.email} style={styles.tab}>
       <p>
+        {searchedUser.isProf && "Dr. "}
         {searchedUser.displayname}{" "}
         {searchedUser.isProf && (
           <span style={styles.professorContainer}>Professor</span>
@@ -75,6 +76,7 @@ const UserContact = (props) => {
         style={styles.tab}
       >
         <p>
+          {contact.isProf && "Dr. "}
           {contact.displayname}{" "}
           {contact.isProf && (
             <span style={styles.professorContainer}>Professor</span>

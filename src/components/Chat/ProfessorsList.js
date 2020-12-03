@@ -18,7 +18,7 @@ const ProfessorsList = (props) => {
         id={professor.email}
         style={styles.tab}
       >
-        <p>{professor.displayname}</p>
+        <p>Dr. {professor.displayname}</p>
         <p>{professor.email}</p>
       </Grid>
     );

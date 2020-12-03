@@ -74,9 +74,9 @@ const Profile = () => {
     };
 
     Axios.post("/api/updateImage", formData, headers).then((res) => {
-      if(res.data.pass){
-        setUploadImage({...uploadImage, temp: false});
-        setLoggedIn(false)
+      if (res.data.pass) {
+        setUploadImage({ ...uploadImage, temp: false });
+        setLoggedIn(false);
       }
       setLoading(false);
     });
@@ -122,7 +122,8 @@ const Profile = () => {
         </Grid>
       </Grid>
 
-      {(uploadImage && uploadImage.temp) &&
+      {uploadImage &&
+        uploadImage.temp &&
         (loading ? (
           <CircularProgress />
         ) : (
@@ -161,6 +162,7 @@ const Profile = () => {
         <Typography display="inline" variant="body1">
           FullName:{" "}
         </Typography>
+        {user.isProf && "Dr. "}
         {`${user.firstname} ${user.lastname}`}
       </Grid>
       <Grid>
@@ -195,18 +197,22 @@ const Profile = () => {
         </Typography>
         {user.faculty}
       </Grid>
-      <Grid>
-        <Typography display="inline" variant="body1">
-          Department:{" "}
-        </Typography>
-        {user.department}
-      </Grid>
-      <Grid>
-        <Typography display="inline" variant="body1">
-          Level:{" "}
-        </Typography>
-        {user.level}
-      </Grid>
+      {!user.isProf && (
+        <>
+          <Grid>
+            <Typography display="inline" variant="body1">
+              Department:{" "}
+            </Typography>
+            {user.department}
+          </Grid>
+          <Grid>
+            <Typography display="inline" variant="body1">
+              Level:{" "}
+            </Typography>
+            {user.level}
+          </Grid>
+        </>
+      )}
     </Grid>
   );
 };
