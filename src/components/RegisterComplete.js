@@ -8,7 +8,7 @@ const RegisterComplete = props => {
     const user = useUser()
 
     useEffect(() => {
-        user && props.history.push("/")
+        user.email && props.history.push("/")
     }, [user, props.history])
 
     return(

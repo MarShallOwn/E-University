@@ -10,7 +10,7 @@ const Register = props => {
     const user = useUser()
 
     useEffect(() => {
-        user && props.history.push("/")
+        user.email && props.history.push("/")
     }, [user, props.history])
 
     const [showError, setShowError] = useState({error: false, reason: null})

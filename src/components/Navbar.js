@@ -31,13 +31,13 @@ const Navbar = props => {
             <Link to="/chat">Chat</Link>
           </li>
           {
-            user && user.isAdmin &&
+            user.isAdmin &&
             <li>
               <Link to="/create-user">Create User</Link>
             </li>
           }
           {
-            !user &&
+            !user.email &&
             <>
             <li>
               <Link to="/register">Register</Link>
@@ -48,7 +48,7 @@ const Navbar = props => {
             </>
           }
           {
-            user &&
+            user.email &&
             <>
             <li>
               <Link to="/profile">Profile</Link>

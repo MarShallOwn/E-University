@@ -7,38 +7,10 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import Axios from "axios";
-import { useUser, useLoggedIn } from "../contexts/UserProvider";
-
-const useStyles = makeStyles(() => ({
-  pictureContainer: {
-    position: "relative",
-    borderRadius: "100%",
-    height: "7rem",
-    width: "7rem",
-    cursor: "pointer",
-  },
-  picture: {
-    position: "absolute",
-    textAlign: "center",
-    height: "100%",
-    borderRadius: "50%",
-    top: "50%",
-    transform: "translateY(-50%)",
-    visibility: "hidden",
-    transition: ".5s",
-  },
-  pictureHover: {
-    backgroundColor: "rgba(0, 0, 0, .3)",
-    color: "white",
-    position: "absolute",
-    textAlign: "center",
-    height: "100%",
-    borderRadius: "50%",
-    top: "50%",
-    transform: "translateY(-50%)",
-    transition: ".5s",
-  },
-}));
+import { useUser, useLoggedIn } from "../../contexts/UserProvider";
+import EditProfile from "./EditProfile";
+import { MdEdit } from 'react-icons/md'
+import ProfileDetails from "./ProfileDetails";
 
 const Profile = () => {
   const profileImageRef = useRef(null);
@@ -51,6 +23,7 @@ const Profile = () => {
 
   const [showChangeButton, setShowChangeButton] = useState(false);
   const [uploadImage, setUploadImage] = useState(null);
+  const [showEditProfile, setShowEditProfile] = useState(false)
 
   const [loading, setLoading] = useState(false);
 
@@ -82,12 +55,15 @@ const Profile = () => {
     });
   };
 
-  const cancelUpdateImage = () => {
-    setUploadImage(null);
+  const cancelUpdate = type => {
+    type === "image" ? setUploadImage(null) : setShowEditProfile(false)
   };
 
   return (
     <Grid container alignItems="center" direction="column">
+      {
+        !showEditProfile && <MdEdit fontSize="1.5rem" style={{marginBottom: '.5rem', cursor: 'pointer'}} onClick={() => setShowEditProfile(true)} />
+      }
       <Grid
         onClick={clickFileUpload}
         onMouseOver={() => setShowChangeButton(true)}
@@ -128,7 +104,7 @@ const Profile = () => {
           <CircularProgress />
         ) : (
           <Grid>
-            <Button onClick={cancelUpdateImage} variant="contained">
+            <Button onClick={() => cancelUpdate("image")} variant="contained">
               Cancel
             </Button>
             <Button
@@ -158,63 +134,41 @@ const Profile = () => {
           Professor
         </Typography>
       )}
-      <Grid>
-        <Typography display="inline" variant="body1">
-          FullName:{" "}
-        </Typography>
-        {user.isProf && "Dr. "}
-        {`${user.firstname} ${user.lastname}`}
-      </Grid>
-      <Grid>
-        <Typography display="inline" variant="body1">
-          E-mail:{" "}
-        </Typography>
-        {user.email}
-      </Grid>
-      {user.street && (
-        <Grid>
-          <Typography display="inline" variant="body1">
-            Street:{" "}
-          </Typography>
-          {user.street}
-        </Grid>
-      )}
-      <Grid>
-        <Typography display="inline" variant="body1">
-          City:{" "}
-        </Typography>
-        {user.city}
-      </Grid>
-      <Grid>
-        <Typography display="inline" variant="body1">
-          Phone Number:{" "}
-        </Typography>
-        {user.phoneNumber}
-      </Grid>
-      <Grid>
-        <Typography display="inline" variant="body1">
-          Faculty:{" "}
-        </Typography>
-        {user.faculty}
-      </Grid>
-      {!user.isProf && (
-        <>
-          <Grid>
-            <Typography display="inline" variant="body1">
-              Department:{" "}
-            </Typography>
-            {user.department}
-          </Grid>
-          <Grid>
-            <Typography display="inline" variant="body1">
-              Level:{" "}
-            </Typography>
-            {user.level}
-          </Grid>
-        </>
-      )}
+      { showEditProfile ? <EditProfile cancelUpdate={cancelUpdate} setShowEditProfile={setShowEditProfile} /> : <ProfileDetails /> }
     </Grid>
   );
 };
 
 export default Profile;
+
+
+const useStyles = makeStyles(() => ({
+  pictureContainer: {
+    position: "relative",
+    borderRadius: "100%",
+    height: "7rem",
+    width: "7rem",
+    cursor: "pointer",
+  },
+  picture: {
+    position: "absolute",
+    textAlign: "center",
+    height: "100%",
+    borderRadius: "50%",
+    top: "50%",
+    transform: "translateY(-50%)",
+    visibility: "hidden",
+    transition: ".5s",
+  },
+  pictureHover: {
+    backgroundColor: "rgba(0, 0, 0, .3)",
+    color: "white",
+    position: "absolute",
+    textAlign: "center",
+    height: "100%",
+    borderRadius: "50%",
+    top: "50%",
+    transform: "translateY(-50%)",
+    transition: ".5s",
+  },
+}));

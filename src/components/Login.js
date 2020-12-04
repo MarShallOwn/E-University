@@ -11,7 +11,7 @@ const Login = props => {
     const setLoggedIn = useLoggedIn()
 
     useEffect(() => {
-        if(user){
+        if(user.email){
             props.location.search && props.history.push(props.location.search.split('=')[1])
         }
     }, [user, props.history, props.location.search])
