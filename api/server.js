@@ -243,6 +243,7 @@ app.get("/api/user", (req, res) => {
       firstname,
       lastname,
       email,
+      street,
       city,
       phoneNumber,
       picture,
@@ -257,6 +258,7 @@ app.get("/api/user", (req, res) => {
       firstname,
       lastname,
       email,
+      street,
       city,
       phoneNumber,
       picture,
@@ -326,6 +328,20 @@ app.post('/api/updateImage', upload.single("myFile"), checkAuthenticated, (req, 
               }
           })
       }
+  })
+})
+
+/**
+ * Update users Profile details
+ */
+app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
+  const { street, city, phoneNumber } = req.body.data;
+
+  userModel.findOneAndUpdate({email: req.user.email}, {street, city, phoneNumber}, (err, user) => {
+    if(user){
+      return res.send({pass:true})
+    }
+    return
   })
 })
 

@@ -4,6 +4,20 @@ import Axios from "axios";
 const context = createContext();
 const loginContext = createContext();
 
+const initUser = {
+  firstname: null,
+  lastname: null,
+  email: null,
+  street: null,
+  city: null,
+  phoneNumber: null,
+  picture: null,
+  department: null,
+  faculty: null,
+  level: null,
+  isProf: null,
+};
+
 /**
  * returns the logged in user
  */
@@ -16,7 +30,7 @@ export const useLoggedIn = () => {
 }
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(initUser);
 
   const [loggedIn, setLoggedIn] = useState(false)
 
@@ -29,7 +43,7 @@ export const UserProvider = ({ children }) => {
           setUser(res.data.user)
         }
         else if(!loggedIn){
-          setUser(undefined)
+          setUser(initUser)
         }
       })
       .catch((err) => {

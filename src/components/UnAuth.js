@@ -10,7 +10,7 @@ const UnAuth = ({ component: Component, ...rest }) => {
 
   useEffect(() => {
     setLoading(true);
-    if(user){
+    if(user.email){
         setAuth(true)
     }
     else{

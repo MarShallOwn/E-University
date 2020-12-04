@@ -10,7 +10,7 @@ const Home = () => {
     return(
         <Grid>
             {
-            !_.isEmpty(user) && 
+            !_.isEmpty(user.email) && 
             <p>Welcome {user.isProf && "Dr. "} {user.firstname} {user.lastname}</p>
             }
             Home Page

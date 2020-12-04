@@ -54,7 +54,8 @@ const ChatRoom = (props) => {
           src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${picture}`}
         />
         <h2 style={{ display: "inline-block" }}>
-          {`${isProf && "Dr. "}${displayname} `}
+          {isProf && "Dr. "}
+          {displayname}{" "}
           {isProf && <span style={styles.professorContainer}>Professor</span>}
         </h2>
       </div>

@@ -15,7 +15,7 @@ import { UserProvider }  from '../contexts/UserProvider';
 import Login from "./Login";
 import Navbar from "./Navbar";
 import UnAuth from "./UnAuth";
-import Profile from "./Profile";
+import Profile from "./Profile/Profile";
 
 //const history = createBrowserHistory()
 
