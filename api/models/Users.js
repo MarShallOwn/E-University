@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const crypto = require('crypto')
 const { Schema } = mongoose
 
 const resultSchema = new Schema({
@@ -80,6 +81,14 @@ const userSchema = new Schema({
         required: true
     },
     level: Number,
+    resetPasswordToken: {
+        type: String,
+        required: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false
+    }
 })
 
 

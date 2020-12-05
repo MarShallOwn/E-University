@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import _ from 'lodash/fp'
 import {Grid, TextField, Button} from '@material-ui/core'
-import { useUser, useLoggedIn } from '../contexts/UserProvider'
+import { useUser, useLoggedIn } from '../../contexts/UserProvider'
 import { useForm } from 'react-hook-form'
 import Axios from 'axios'
 
@@ -60,9 +61,9 @@ const Login = props => {
                 <p>This field is required</p>
             )}
             <Button style={{marginTop: '2rem'}} variant="contained" color="primary" onClick={handleSubmit(loginUser)}>
-                Primary
+                Login
             </Button>
-
+            <Link to="/auth/forgot-password">Forgot Password ?</Link>
         </Grid>
     )
 }
