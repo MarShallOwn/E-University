@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash/fp'
 import {Grid, TextField, Button} from '@material-ui/core'
-import { useUser } from '../contexts/UserProvider'
+import { useUser } from '../../contexts/UserProvider'
 import { useForm } from 'react-hook-form'
 import Axios from 'axios'
 
@@ -41,7 +41,7 @@ const Register = props => {
                 <p>This field is required</p>
             )}
             <Button style={{marginTop: '2rem'}} variant="contained" color="primary" onClick={handleSubmit(registerUser)}>
-                Primary
+                Continue Registeration
             </Button>
         </Grid>
     )

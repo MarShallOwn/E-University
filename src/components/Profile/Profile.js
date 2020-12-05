@@ -9,8 +9,10 @@ import {
 import Axios from "axios";
 import { useUser, useLoggedIn } from "../../contexts/UserProvider";
 import EditProfile from "./EditProfile";
-import { MdEdit } from 'react-icons/md'
+import { MdEdit, MdLock, MdEmail } from "react-icons/md";
 import ProfileDetails from "./ProfileDetails";
+import ChangeEmail from "./ChangeEmail";
+import ChangePassword from "./ChangePassword";
 
 const Profile = () => {
   const profileImageRef = useRef(null);
@@ -23,7 +25,7 @@ const Profile = () => {
 
   const [showChangeButton, setShowChangeButton] = useState(false);
   const [uploadImage, setUploadImage] = useState(null);
-  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [showProfileSection, setShowProfileSection] = useState("showDetails");
 
   const [loading, setLoading] = useState(false);
 
@@ -55,15 +57,69 @@ const Profile = () => {
     });
   };
 
-  const cancelUpdate = type => {
-    type === "image" ? setUploadImage(null) : setShowEditProfile(false)
+  const cancelUpdate = (type) => {
+    type === "image"
+      ? setUploadImage(null)
+      : setShowProfileSection("showDetails");
   };
+
+  let section;
+
+  if (showProfileSection === "showDetails") {
+    section = <ProfileDetails />;
+  } else if (showProfileSection === "editDetails") {
+    section = (
+      <EditProfile
+        cancelUpdate={cancelUpdate}
+        setShowProfileSection={setShowProfileSection}
+      />
+    );
+  } else if (showProfileSection === "changePassword") {
+    section = (
+      <ChangePassword
+        cancelUpdate={cancelUpdate}
+        setShowProfileSection={setShowProfileSection}
+      />
+    );
+  } else if (showProfileSection === "changeEmail") {
+    section = (
+      <ChangeEmail
+        cancelUpdate={cancelUpdate}
+        setShowProfileSection={setShowProfileSection}
+      />
+    );
+  }
 
   return (
     <Grid container alignItems="center" direction="column">
-      {
-        !showEditProfile && <MdEdit fontSize="1.5rem" style={{marginBottom: '.5rem', cursor: 'pointer'}} onClick={() => setShowEditProfile(true)} />
-      }
+      <Grid
+        item
+        container
+        justify="center"
+        alignContent="space-around"
+        style={{ marginBottom: ".5rem" }}
+      >
+        <MdEdit
+          fontSize="1.5rem"
+          style={{ cursor: "pointer" }}
+          onClick={() => setShowProfileSection("editDetails")}
+        />
+        <MdLock
+          fontSize="1.5rem"
+          style={{
+            margin: "0 .5rem",
+            cursor: "pointer",
+          }}
+          onClick={() => setShowProfileSection("changePassword")}
+        />
+        <MdEmail
+          fontSize="1.5rem"
+          style={{
+            cursor: "pointer",
+          }}
+          onClick={() => setShowProfileSection("changeEmail")}
+        />
+      </Grid>
       <Grid
         onClick={clickFileUpload}
         onMouseOver={() => setShowChangeButton(true)}
@@ -134,13 +190,12 @@ const Profile = () => {
           Professor
         </Typography>
       )}
-      { showEditProfile ? <EditProfile cancelUpdate={cancelUpdate} setShowEditProfile={setShowEditProfile} /> : <ProfileDetails /> }
+      {section}
     </Grid>
   );
 };
 
 export default Profile;
-
 
 const useStyles = makeStyles(() => ({
   pictureContainer: {

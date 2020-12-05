@@ -9,6 +9,9 @@ const session = require("express-session");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const {v4: uuidv4} = require('uuid');
+const nodemailer = require('nodemailer')
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
 const roomModel = require("./models/Rooms");
@@ -22,12 +25,37 @@ const bcrypt = require("bcrypt");
 const PORT = process.env.PORT || 8080;
 
 /**
+ * Google OAuth config
+ */
+const oauth2Client = new OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, "https://developers.google.com/oauthplayground" )
+
+oauth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+});
+const accessToken = oauth2Client.getAccessToken()
+
+/**
+ * nodemailer config
+ */
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: process.env.EMAIL,
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+    accessToken
+  }
+})
+
+/**
  * Cloudinary Config
  */
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Profile Images
@@ -175,7 +203,7 @@ app.post("/api/registerUser", (req, res) => {
 /**
  * if the national id is correct then proceed the register with more data inputs
  */
-app.post("/api/continueRegister", async (req, res) => {
+app.post("/api/continueRegister", (req, res) => {
   const {
     email,
     password,
@@ -190,10 +218,9 @@ app.post("/api/continueRegister", async (req, res) => {
     return res.send({ status: 404, pass: false });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  userModel.findOne({ nationalID }, (err, user) => {
+  userModel.findOne({ nationalID }, async (err, user) => {
     if (!err && !user.email) {
+      const hashedPassword = await bcrypt.hash(password, 10);
       user.email = email;
       user.password = hashedPassword;
       user.street = street;
@@ -232,6 +259,87 @@ app.get("/api/success", (req, res) => {
 app.get("/api/failure", (req, res) => {
   res.send({ status: 200, pass: false });
 });
+
+/**
+ * Forgot Password token Request
+ */
+app.post("/api/auth/forgotpassword", checkNotAuthenticated, (req, res) => {
+
+  if(!req.body.data.email) return 
+
+  userModel.findOne({email: req.body.data.email}, (err, user) => {
+    if(user){
+
+      // added reset password token and expiry time
+      user.resetPasswordToken = uuidv4();
+      user.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
+
+      user.save()
+      .then(savedUser => {
+        const link = `http://localhost:3000/auth/reset/${savedUser.resetPasswordToken}`;
+
+        // send reset token password link
+        const mailOptions = {
+          from: process.env.EMAIL,
+          to: savedUser.email,
+          subject: "E-University: Password change request",
+          html: `<div><h2>Hi ${savedUser.firstname} ${savedUser.lastname}</h2><br><p>Please click on the following button to reset your password this button will expire after 1 hour.</p><button><a style="text-decoration:none;" href='${link}' >Click Here</a></button><p>If you did not request this, please ignore this email and your password will remain unchanged.</p></div>`
+        };
+  
+        transporter.sendMail(mailOptions, (err, info) => {
+          if(err) return res.send({pass: false})
+          return res.send({pass: true})
+        })
+      })
+
+    }
+    else{
+      return res.send({pass: false})
+    }
+  })
+})
+
+/**
+ * After user changed his password using the token
+ */
+app.post("/api/auth/reset/:resetToken", checkNotAuthenticated, (req, res) => {
+
+  const { password, confirmPassword } = req.body.data
+
+  if (password !== confirmPassword) {
+    return
+  }
+
+  userModel.findOne({resetPasswordToken: req.params.resetToken, resetPasswordExpires: {$gt: Date.now()}}, async (err, user) => {
+    if(!user) return res.send({pass: false})
+
+    // set new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires= null;
+
+    // save new password
+    user.save((err) => {
+      if(err) res.send({pass: false})
+
+      // send confirmation mail
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: user.email,
+        subject: "E-University: Your Password has been changed",
+        html: `<div><h2>Hi ${user.firstname} ${user.lastname}</h2><p>This is a confirmation that the password for your account has just been changed</p></div>`
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {
+        if(err) return res.send({pass: false})
+
+        return res.send({pass: true})
+      })
+    })
+    
+  })
+})
 
 /**
  * Get logged in user data
@@ -332,7 +440,7 @@ app.post('/api/updateImage', upload.single("myFile"), checkAuthenticated, (req, 
 })
 
 /**
- * Update users Profile details
+ * Update user's Profile details
  */
 app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
   const { street, city, phoneNumber } = req.body.data;
@@ -342,6 +450,47 @@ app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
       return res.send({pass:true})
     }
     return
+  })
+})
+
+/**
+ * Change user's password
+ */
+app.post("/api/auth/changePassword", checkAuthenticated, (req, res) => {
+
+  const { currentPassword, newPassword, confirmPassword } = req.body.data
+
+  if(newPassword !== confirmPassword) return
+
+  userModel.findOne({email: req.user.email}, async (err, user) => {
+    if(!user) return
+
+    if(await bcrypt.compare(currentPassword, user.password)){
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      user.save()
+
+      return res.send({pass: true})
+    }
+    return res.send({pass: false})
+  })
+
+})
+
+/**
+ *  Change Email
+ */
+app.post("/api/auth/changeEmail", checkAuthenticated, (req, res) => {
+  const { email } = req.body.data
+
+  if(!email) return
+
+  userModel.findOne({email: req.user.email}, (err, user) => {
+    if(!user) return
+
+    user.email = email
+    user.save()
+    return res.send({pass: true})
   })
 })
 

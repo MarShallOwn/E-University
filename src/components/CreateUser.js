@@ -78,7 +78,7 @@ const CreateUser = props => {
 
             
             <Button style={{marginTop: '2rem'}} variant="contained" color="primary" onClick={handleSubmit(storeUser)}>
-                Primary
+                Create User
             </Button>
         </Grid>
     )

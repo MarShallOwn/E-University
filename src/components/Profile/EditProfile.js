@@ -7,7 +7,7 @@ import Axios from 'axios'
 
 const EditProfile = props => {
 
-    const { cancelUpdate, setShowEditProfile } = props
+    const { cancelUpdate, setShowProfileSection } = props
 
     const user = useUser()
     const setLoggedIn = useLoggedIn()
@@ -19,13 +19,14 @@ const EditProfile = props => {
         .then(res => {
             if(res.data.pass){
                 setLoggedIn(false)
-                setShowEditProfile(false)
+                setShowProfileSection("showDetails")
             }
         })
     }
 
     return(
         <Grid container alignItems="center" direction="column">
+            <h3>Edit Profile</h3>
             <TextField name="street" id="street" label="Street" defaultValue={user.street} inputRef={register()} />
             <TextField name="city" id="city" label="City" defaultValue={user.city} inputRef={register({
                 required: true
@@ -50,7 +51,7 @@ const EditProfile = props => {
             )}
 
             <Grid>
-                <Button style={{marginTop: '2rem'}} variant="contained" onClick={() => cancelUpdate("profile")}>
+                <Button style={{marginTop: '2rem'}} variant="contained" onClick={() => cancelUpdate("editDetails")}>
                     Cancel
                 </Button>
                 <Button style={{margin: '2rem 0 0 .5rem'}} variant="contained" color="primary" onClick={handleSubmit(registerUser)}>

@@ -81,7 +81,7 @@ const ContinueRegister = props => {
                 <p>This field should be 11-digits</p>
             )}
             <Button style={{marginTop: '2rem'}} variant="contained" color="primary" onClick={handleSubmit(registerUser)}>
-                Primary
+                Register
             </Button>
 
         </Grid>

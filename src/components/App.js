@@ -6,16 +6,19 @@ import Home from './Home';
 import About from './About';
 import ContactUs from "./ContactUs";
 import CreateUser from './CreateUser';
-import Register from "./Register";
-import ContinueRegister from "./ContinueRegister";
+import Register from "./Auth/Register";
+import ContinueRegister from "./Auth/ContinueRegister";
 import RegisterComplete from "./RegisterComplete";
 import Auth from './Auth';
 import Chat from './Chat/Chat';
 import { UserProvider }  from '../contexts/UserProvider';
-import Login from "./Login";
+import Login from "./Auth/Login";
 import Navbar from "./Navbar";
 import UnAuth from "./UnAuth";
 import Profile from "./Profile/Profile";
+import ForgotPassword from "./Auth/ForgotPassword";
+import CheckMail from "./Auth/CheckMail";
+import ResetPassword from "./Auth/ResetPassword";
 
 //const history = createBrowserHistory()
 
@@ -35,7 +38,10 @@ const App = () => {
             <Route path="/register" render={ props => <Register {...props} />} />
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
             <Route path="/register-complete" render={ props => <RegisterComplete {...props} />} />
+            <Route path="/check-email" render={props => <CheckMail {...props} />} />
             <UnAuth path="/login" component={Login} />
+            <UnAuth path="/auth/forgot-password" component={ForgotPassword} />
+            <UnAuth path="/auth/reset/:resetToken" component={ResetPassword} />
             <Auth path="/chat" component={Chat} />
             <Auth path="/profile" component={Profile} />
           </Switch>
