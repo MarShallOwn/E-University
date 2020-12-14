@@ -12,7 +12,7 @@ const CreateUser = props => {
 
     const storeUser = data => {
         data = {...data, isProf}
-        Axios.post('/api/storeUser', {data})
+        Axios.post('/api/createUser', {data})
         .then(res => res.data.status === 200 && props.history.push('/home'))
     }
 
@@ -64,7 +64,7 @@ const CreateUser = props => {
                 <p>This field is required</p>
             )}
 
-            <FormControl name="isProf" variant="filled" style={{width: '10rem', marginTop: '1.5rem'}}>
+            <FormControl name="isProf" style={{width: '10rem', marginTop: '1.5rem'}}>
                 <InputLabel>Professor</InputLabel>
                 <Select
                 value={isProf}

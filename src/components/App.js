@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Home from './Home';
 import About from './About';
 import ContactUs from "./ContactUs";
-import CreateUser from './CreateUser';
+import CreateUser from './Admin/User/CreateUser';
 import Register from "./Auth/Register";
 import ContinueRegister from "./Auth/ContinueRegister";
 import RegisterComplete from "./RegisterComplete";
@@ -19,6 +19,7 @@ import Profile from "./Profile/Profile";
 import ForgotPassword from "./Auth/ForgotPassword";
 import CheckMail from "./Auth/CheckMail";
 import ResetPassword from "./Auth/ResetPassword";
+import CreateFaculty from "./Admin/Faculty/CreateFaculty";
 
 //const history = createBrowserHistory()
 
@@ -34,7 +35,8 @@ const App = () => {
             <Route exact path="/" render={ props => <Home {...props} />} />
             <Route path="/about" render={ props => <About {...props} />} />
             <Route path="/contact-us" render={ props => <ContactUs {...props} />} />
-            <Route path="/create-user" render={ props => <CreateUser {...props} />} />
+            <Route path="/admin/create-user" render={ props => <CreateUser {...props} />} />
+            <Auth path="/admin/create-faculty"component={CreateFaculty} />
             <Route path="/register" render={ props => <Register {...props} />} />
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
             <Route path="/register-complete" render={ props => <RegisterComplete {...props} />} />

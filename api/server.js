@@ -15,6 +15,7 @@ const OAuth2 = google.auth.OAuth2;
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
 const roomModel = require("./models/Rooms");
+const facultyModel = require("./models/Faculties");
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
@@ -150,7 +151,7 @@ const checkNotAuthenticated = (req, res, next) => {
 /**
  * data entry to add users data to the database
  */
-app.post("/api/storeUser", checkAuthenticated, async (req, res) => {
+app.post("/api/createUser", checkAuthenticated, async (req, res) => {
 
   if(req.user.isAdmin){
     const {
@@ -749,5 +750,18 @@ app.post("/api/sendMessage", checkAuthenticated, (req, res) => {
     res.sendStatus(404);
   }
 });
+
+app.post("/api/createFaculty", async (req, res) => {
+  const { data } = req.body
+
+
+  const faculty = new facultyModel({...data});
+
+  await faculty.save((err, result) => {
+    if(err) return res.send({pass: false})
+
+    return res.send({pass: true})
+  })
+})
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
