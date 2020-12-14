@@ -764,4 +764,44 @@ app.post("/api/createFaculty", async (req, res) => {
   })
 })
 
+/**
+ * Get list of faculties name
+ */
+app.get("/api/getFacultiesNames", (req, res) => {
+  facultyModel.find({},'name departments', (err, faculties) => {
+    if(err) return res.send({pass: false})
+
+    return res.send({pass: true, faculties})
+  })
+})
+
+/**
+ * Get number levels of the selected Faculties
+ */
+app.get("/api/getFacultyLevels/:facultyName", (req, res) => {
+
+  console.log(req.params.facultyName)
+  facultyModel.findOne({name: req.params.facultyName}, 'levels', (err, faculty) => {
+    if(err) return res.send({pass: false})
+console.log(faculty)
+    const levelsNumber = faculty.levels.length
+    return res.send({pass: true, levelsNumber})
+  })
+})
+
+/**
+ * Checks if the selected level of the selected Faculty has departments or not and if it has then returns the list of the departments
+ */
+app.get("/api/checkLevelHasDepartment/:selectedFaculty/:selectedLevel", (req, res) => {
+  const {selectedFaculty, selectedLevel} = req.params
+  facultyModel.findOne({name: selectedFaculty}, (err , faculty) => {
+
+    if(err) return res.send({pass: false})
+
+    const departments = faculty.levels[selectedLevel-1].hasDepartments ? faculty.departments : [];
+
+    return res.send({pass: true, departments})
+  })
+})
+
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
