@@ -6,6 +6,8 @@ import { useLoggedIn, useUser } from "../contexts/UserProvider";
 import { useStyles } from "./styleNavbar";
 import Axios from "axios";
 
+const routes = ["/","/about","/contact-us", "/chat", "/admin/create-user", "/register", "/login"]
+
 const Navbar = (props) => {
   const classes = useStyles();
 
@@ -14,7 +16,9 @@ const Navbar = (props) => {
 
   const [activeTab, setActiveTab] = useState(props.location.pathname);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    !routes.includes(props.location.pathname) && setActiveTab(null)
+  }, [props.location.pathname]);
 
   const logout = () => {
     Axios.get("/api/logout", { withCredentials: true }).then((res) => {
@@ -50,36 +54,36 @@ const Navbar = (props) => {
         </Grid>
         <Grid container item xs={10} justify="flex-end" alignItems="center">
           <li onClick={() => setActiveTab("/")}>
-            <Link to="/">Home</Link>
-            {activeTab === "/" && <span></span>}
+            <Link to={routes[0]}>Home</Link>
+            {activeTab === routes[0] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/about")}>
-            <Link to="/about">About</Link>
-            {activeTab === "/about" && <span></span>}
+            <Link to={routes[1]}>About</Link>
+            {activeTab === routes[1] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/contact-us")}>
-            <Link to="/contact-us">Contact Us</Link>
-            {activeTab === "/contact-us" && <span></span>}
+            <Link to={routes[2]}>Contact Us</Link>
+            {activeTab === routes[2] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/chat")}>
-            <Link to="/chat">Chat</Link>
-            {activeTab === "/chat" && <span></span>}
+            <Link to={routes[3]}>Chat</Link>
+            {activeTab === routes[3] && <span></span>}
           </li>
           {user.isAdmin && (
             <li onClick={() => setActiveTab("/admin/create-user")}>
-              <Link to="/admin/create-user">Create User</Link>
-              {activeTab === "/admin/create-user" && <span></span>}
+              <Link to={routes[4]}>Create User</Link>
+              {activeTab === routes[4] && <span></span>}
             </li>
           )}
           {!user.email && (
             <>
               <li onClick={() => setActiveTab("/register")}>
-                <Link to="/register">Register</Link>
-                {activeTab === "/register" && <span></span>}
+                <Link to={routes[5]}>Register</Link>
+                {activeTab === routes[5] && <span></span>}
               </li>
               <li onClick={() => setActiveTab("/login")}>
-                <Link to="/login">Login</Link>
-                {activeTab === "/login" && <span></span>}
+                <Link to={routes[6]}>Login</Link>
+                {activeTab === routes[6] && <span></span>}
               </li>
             </>
           )}
