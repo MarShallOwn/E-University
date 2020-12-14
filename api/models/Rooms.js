@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-let messageSchema = new Schema({
+const messageSchema = new Schema({
     from: {
         type: Object,
         required: true
@@ -13,7 +13,7 @@ let messageSchema = new Schema({
     }
 })
 
-let roomSchema = new Schema({
+const roomSchema = new Schema({
     participants: Array,
     messages: [messageSchema],
     createdAt: Date
