@@ -29,7 +29,7 @@ const CreateFaculty = (props) => {
   const [departments, setDepartments] = useState(["General"]);
 
   const createFaculty = (data) => {
-    data = { ...data, departments, currentTerm };
+    data = { ...data, departments, currentTerm, name: data.name.trim() };
     data.levels = data.levels.filter((item) => item !== null);
 
     for (let level in data.levels) {

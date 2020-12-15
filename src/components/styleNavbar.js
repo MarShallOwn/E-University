@@ -33,12 +33,14 @@ export const useStyles = makeStyles( theme => ({
             display: 'block',
             textDecoration : 'none',
             color: 'white',
-            fontSize: '1.15rem',
+            fontSize: '14px',
+            font: 'normal normal 300 14px/23px Poppins'
         }
     },
     universityName: {
         cursor: 'pointer',
-        fontSize: '1.2rem',
+        fontSize: '18px',
+        font: 'normal normal 300 18px/30px Poppins',
         color: 'white'
     },
     profileContainer: {

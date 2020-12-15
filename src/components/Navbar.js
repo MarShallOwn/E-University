@@ -54,35 +54,35 @@ const Navbar = (props) => {
         </Grid>
         <Grid container item xs={10} justify="flex-end" alignItems="center">
           <li onClick={() => setActiveTab("/")}>
-            <Link to={routes[0]}>Home</Link>
+            <Link to={routes[0]} style={activeTab === "/" ? {fontWeight: 'bold'}: {}}>Home</Link>
             {activeTab === routes[0] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/about")}>
-            <Link to={routes[1]}>About</Link>
+            <Link to={routes[1]} style={activeTab === "/about" ? {fontWeight: 'bold'}: {}}>About</Link>
             {activeTab === routes[1] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/contact-us")}>
-            <Link to={routes[2]}>Contact Us</Link>
+            <Link to={routes[2]} style={activeTab === "/contact-us" ? {fontWeight: 'bold'}: {}}>Contact Us</Link>
             {activeTab === routes[2] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/chat")}>
-            <Link to={routes[3]}>Chat</Link>
+            <Link to={routes[3]} style={activeTab === "/chat" ? {fontWeight: 'bold'}: {}}>Chat</Link>
             {activeTab === routes[3] && <span></span>}
           </li>
           {user.isAdmin && (
             <li onClick={() => setActiveTab("/admin/create-user")}>
-              <Link to={routes[4]}>Create User</Link>
+              <Link to={routes[4]} style={activeTab === "/admin/create-user" ? {fontWeight: 'bold'}: {}}>Create User</Link>
               {activeTab === routes[4] && <span></span>}
             </li>
           )}
           {!user.email && (
             <>
               <li onClick={() => setActiveTab("/register")}>
-                <Link to={routes[5]}>Register</Link>
+                <Link to={routes[5]} style={activeTab === "/register" ? {fontWeight: 'bold'}: {}}>Register</Link>
                 {activeTab === routes[5] && <span></span>}
               </li>
               <li onClick={() => setActiveTab("/login")}>
-                <Link to={routes[6]}>Login</Link>
+                <Link to={routes[6]} style={activeTab === "/login" ? {fontWeight: 'bold'}: {}}>Login</Link>
                 {activeTab === routes[6] && <span></span>}
               </li>
             </>
