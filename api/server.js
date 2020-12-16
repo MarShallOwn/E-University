@@ -819,7 +819,52 @@ app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
 
     return res.send({pass: true, faculty})
   })
+})
 
+/**
+ *  Get all Faculties in an array to be shown in a list
+ */
+app.get("/api/allFaculties", (req, res) => {
+
+  facultyModel.find({}, "name", (err, faculties) => {
+    if(err) return res.send({pass: false})
+
+    return res.send({pass: true, faculties})
+  })
+})
+
+/**
+ * Get selected faculty to be edited
+ */
+app.post("/api/facultyToBeEdited", checkAuthenticated, (req, res) => {
+  facultyModel.findOne({ _id: req.body.id }, (err, faculty) => {
+    if(err) return res.send({pass: false})
+
+    return res.send({pass:true, faculty})
+  })
+})
+
+/**
+ * Edit Faculty
+ */
+app.post("/api/editFaculty", (req, res) => {
+  const { data, id } = req.body
+
+  facultyModel.findOneAndUpdate({_id: id}, {...data}, (err, faculty) => {
+    if(err) return res.send({pass: false})
+
+    if(faculty.name !== data.name){
+      userModel.updateMany({faculty: faculty.name}, {faculty: data.name}, (err, users) => {
+        if(err) return res.send({pass: false})
+  
+        return res.send({pass: true})
+      })
+    }
+    else{
+      return res.send({pass: true})
+    }
+
+  });
 })
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

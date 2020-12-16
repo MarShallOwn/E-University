@@ -34,24 +34,36 @@ const Level = (props) => {
     activeLevel,
     level,
     control,
-    setValue={setValue}
+    levelData,
+    setValue = { setValue },
   } = props;
 
   useEffect(() => {
-    register({name: `levels.${level}.hasDepartments`});
-  }, [register])
+    register({ name: `levels.${level}.hasDepartments` });
+  }, [register]);
 
-  const [levelsNumber, setLevelsNumber] = useState([]);
-  const [hasDepartments, setHasDepartments] = useState(0);
+  const [subjectsNumber, setSubjectsNumber] = useState(() => {
+    const array = [];
+    if (levelData) {
+      for (let i = 0; i < levelData.subjects.length; i++) {
+        array.push(i);
+      }
+    }
+
+    return array;
+  });
+  const [hasDepartments, setHasDepartments] = useState(levelData ? levelData.hasDepartments : 0);
 
   const deleteLevelField = (value) => {
-    setLevelsNumber(() => levelsNumber.filter((item, index) => item !== value));
+    setSubjectsNumber(() =>
+      subjectsNumber.filter((item, index) => item !== value)
+    );
   };
 
   /**
    * render all the subjects
    */
-  let renderSubjects = levelsNumber.map((value, index) => (
+  let renderSubjects = subjectsNumber.map((value, index) => (
     <Subject
       key={value}
       value={value}
@@ -63,6 +75,7 @@ const Level = (props) => {
       level={level}
       subjectNumber={index + 1}
       control={control}
+      subject={levelData ? levelData.subjects[index] : null}
     />
   ));
 
@@ -71,9 +84,12 @@ const Level = (props) => {
    * handle radio change of has departments
    */
   const handleSelectChange = (e) => {
-    setValue(`levels.${level}.hasDepartments`, e.target.value)
+    setValue(`levels.${level}.hasDepartments`, e.target.value);
     setHasDepartments(parseInt(e.target.value));
   };
+
+  const checkLevelHasDepartment = () => levelData.hasDepartments ? 1 : 0;
+
 
   return (
     <Grid style={activeLevel !== level ? { display: "none" } : {}}>
@@ -82,7 +98,7 @@ const Level = (props) => {
           <FormLabel>Has Departments ?</FormLabel>
           <Select
             name={`levels.${level}.hasDepartments`}
-            defaultValue={0}
+            defaultValue={levelData ? checkLevelHasDepartment : 0}
             onChange={(e) => handleSelectChange(e)}
             displayEmpty
             ref={register}
@@ -97,11 +113,11 @@ const Level = (props) => {
         <p style={{ display: "inline-block" }}>Subjects</p>
         <MdAdd
           onClick={() =>
-            setLevelsNumber([
-              ...levelsNumber,
-              levelsNumber.length === 0
+            setSubjectsNumber([
+              ...subjectsNumber,
+              subjectsNumber.length === 0
                 ? 0
-                : levelsNumber[levelsNumber.length - 1] + 1,
+                : subjectsNumber[subjectsNumber.length - 1] + 1,
             ])
           }
           style={styles.addButton}
