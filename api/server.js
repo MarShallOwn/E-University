@@ -804,4 +804,22 @@ app.get("/api/checkLevelHasDepartment/:selectedFaculty/:selectedLevel", (req, re
   })
 })
 
+/**
+ * Get the faculty that the user is enrolled in
+ */
+app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
+
+  facultyModel.findOne({name: req.user.faculty}, (err, doc) => {
+    if(err) return res.send({pass: false})
+
+    const {name, currentTerm, creditHours} = doc
+
+    const level = doc.levels[req.user.level - 1]
+    const faculty = {name, currentTerm, creditHours, level, department: req.user.department}
+
+    return res.send({pass: true, faculty})
+  })
+
+})
+
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
