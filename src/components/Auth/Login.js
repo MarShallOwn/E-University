@@ -13,7 +13,10 @@ const Login = props => {
 
     useEffect(() => {
         if(user.email){
-            props.location.search && props.history.push(props.location.search.split('=')[1])
+            props.location.search && props.history.push({
+                pathname: props.location.search.split('=')[1],
+                state: props.location.state
+            })
         }
     }, [user, props.history, props.location.search])
 

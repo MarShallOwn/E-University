@@ -21,6 +21,8 @@ import CheckMail from "./Auth/CheckMail";
 import ResetPassword from "./Auth/ResetPassword";
 import CreateFaculty from "./Admin/Faculty/CreateFaculty";
 import Faculty from "./Faculty/Faculty";
+import FacultiesList from "./Admin/Faculty/FacultiesList"
+import EditFaculty from "./Admin/Faculty/EditFaculty";
 
 //const history = createBrowserHistory()
 
@@ -38,6 +40,8 @@ const App = () => {
             <Route path="/contact-us" render={ props => <ContactUs {...props} />} />
             <Route path="/admin/create-user" render={ props => <CreateUser {...props} />} />
             <Auth path="/admin/create-faculty"component={CreateFaculty} />
+            <Auth path="/admin/faculties-list" component={FacultiesList} />
+            <Auth path="/admin/edit-faculty" component={EditFaculty} />
             <Route path="/register" render={ props => <Register {...props} />} />
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
             <Route path="/register-complete" render={ props => <RegisterComplete {...props} />} />

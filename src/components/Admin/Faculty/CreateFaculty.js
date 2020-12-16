@@ -40,7 +40,8 @@ const CreateFaculty = (props) => {
     }
 
     console.log(data);
-    Axios.post("/api/createFaculty", { data }).then();
+    Axios.post("/api/createFaculty", { data })
+    .then(res => res.data.pass && props.history.push('/admin/faculties-list'));
   };
 
   const saveDepartments = (data) => {

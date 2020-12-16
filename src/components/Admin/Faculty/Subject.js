@@ -28,18 +28,19 @@ const Subject = (props) => {
     hasDepartments,
     level,
     control,
-    subjectNumber
+    subjectNumber,
+    subject
   } = props;
 
   const [term, setTerm] = useState(1);
   const [creditHours, setCreditHours] = useState(1);
   const [hasSection, setHasSection] = useState(1);
-  const [selectedDepartments, setSelectedDepartments] = useState([
-    Array(departments.length - 1).fill(false)
-  ]);
+  const [selectedDepartments, setSelectedDepartments] = useState(
+    subject ? subject.departments : Array(departments.length - 1).fill(false)
+  );
 
   useEffect(() => {
-    setSelectedDepartments(Array(departments.length - 1).fill(false));
+    setSelectedDepartments(subject ? subject.departments : Array(departments.length - 1).fill(false));
   }, [departments, hasDepartments]);
 
   const selectDepartmentsChange = (e) => {
@@ -48,10 +49,13 @@ const Subject = (props) => {
     setSelectedDepartments(changedSelection);
   };
 
+  const checkSubjectHasSection = () => subject.hasSection ? 1 : 0;
+
   return (
     <Grid key={value} style={{borderBottom: '1px solid grey', padding: '2rem 0'}}>
       <Grid style={{ position: "relative" }}>
         <TextField
+        defaultValue={subject ? subject.name : ''}
           id={`levels${value}`}
           name={`levels.${level}.subjects.${subjectNumber}.name`}
           label="Subject Name"
@@ -78,10 +82,10 @@ const Subject = (props) => {
           <Controller
           control={control}
           name={`levels.${level}.subjects.${subjectNumber}.term`}
-          defaultValue={1}
+          defaultValue={subject ? subject.term : 1}
           as={
             <Select
-            defaultValue={1}
+            defaultValue={subject ? subject.term : 1}
             onChange={(e) => setTerm(e.target.value)}
             displayEmpty
           >
@@ -103,10 +107,10 @@ const Subject = (props) => {
           <Controller 
           control={control}
           name={`levels.${level}.subjects.${subjectNumber}.creditHours`}
-          defaultValue={1}
+          defaultValue={subject ? subject.creditHours : 1}
           as={
             <Select
-            defaultValue={1}
+            defaultValue={subject ? subject.creditHours : 1}
             onChange={(e) => setCreditHours(e.target.value)}
             displayEmpty
           >
@@ -128,10 +132,10 @@ const Subject = (props) => {
           <Controller
           control={control}
           name={`levels.${level}.subjects.${subjectNumber}.hasSection`}
-          defaultValue={1}
+          defaultValue={subject ? checkSubjectHasSection : 1}
           as={
             <Select
-            defaultValue={1}
+            defaultValue={subject ? checkSubjectHasSection : 1}
             onChange={e => setHasSection(parseInt(e.target.value))}
             displayEmpty
           >
@@ -157,6 +161,7 @@ const Subject = (props) => {
                   control={
                     <Checkbox
                       color="primary"
+                      defaultChecked={subject && value}
                       onChange={selectDepartmentsChange}
                     />
                   }

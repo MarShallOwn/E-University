@@ -31,7 +31,8 @@ const Auth = ({ component: Component, ...rest }) => {
           render={(props) =>
             auth ? <Component {...props} /> : <Redirect to={{
                 pathname: '/login',
-                search: `?next=${location.pathname}`
+                search: `?next=${location.pathname}`,
+                state: location.state
             }} />
           }
         />
