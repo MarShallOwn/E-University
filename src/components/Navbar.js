@@ -6,7 +6,7 @@ import { useLoggedIn, useUser } from "../contexts/UserProvider";
 import { useStyles } from "./styleNavbar";
 import Axios from "axios";
 
-const routes = ["/","/about","/contact-us", "/chat", "/admin/create-user", "/register", "/login"]
+const routes = ["/","/about", "/Faculty", "/contact-us", "/chat", "/admin/create-user", "/register", "/login"]
 
 const Navbar = (props) => {
   const classes = useStyles();
@@ -61,29 +61,33 @@ const Navbar = (props) => {
             <Link to={routes[1]} style={activeTab === "/about" ? {fontWeight: 'bold'}: {}}>About</Link>
             {activeTab === routes[1] && <span></span>}
           </li>
-          <li onClick={() => setActiveTab("/contact-us")}>
-            <Link to={routes[2]} style={activeTab === "/contact-us" ? {fontWeight: 'bold'}: {}}>Contact Us</Link>
+          <li onClick={() => setActiveTab("/Faculty")}>
+            <Link to={routes[2]} style={activeTab === "/Faculty" ? {fontWeight: 'bold'}: {}}>College</Link>
             {activeTab === routes[2] && <span></span>}
           </li>
-          <li onClick={() => setActiveTab("/chat")}>
-            <Link to={routes[3]} style={activeTab === "/chat" ? {fontWeight: 'bold'}: {}}>Chat</Link>
+          <li onClick={() => setActiveTab("/contact-us")}>
+            <Link to={routes[3]} style={activeTab === "/contact-us" ? {fontWeight: 'bold'}: {}}>Contact Us</Link>
             {activeTab === routes[3] && <span></span>}
+          </li>
+          <li onClick={() => setActiveTab("/chat")}>
+            <Link to={routes[4]} style={activeTab === "/chat" ? {fontWeight: 'bold'}: {}}>Chat</Link>
+            {activeTab === routes[4] && <span></span>}
           </li>
           {user.isAdmin && (
             <li onClick={() => setActiveTab("/admin/create-user")}>
-              <Link to={routes[4]} style={activeTab === "/admin/create-user" ? {fontWeight: 'bold'}: {}}>Create User</Link>
-              {activeTab === routes[4] && <span></span>}
+              <Link to={routes[5]} style={activeTab === "/admin/create-user" ? {fontWeight: 'bold'}: {}}>Create User</Link>
+              {activeTab === routes[5] && <span></span>}
             </li>
           )}
           {!user.email && (
             <>
               <li onClick={() => setActiveTab("/register")}>
-                <Link to={routes[5]} style={activeTab === "/register" ? {fontWeight: 'bold'}: {}}>Register</Link>
-                {activeTab === routes[5] && <span></span>}
+                <Link to={routes[6]} style={activeTab === "/register" ? {fontWeight: 'bold'}: {}}>Register</Link>
+                {activeTab === routes[6] && <span></span>}
               </li>
               <li onClick={() => setActiveTab("/login")}>
-                <Link to={routes[6]} style={activeTab === "/login" ? {fontWeight: 'bold'}: {}}>Login</Link>
-                {activeTab === routes[6] && <span></span>}
+                <Link to={routes[7]} style={activeTab === "/login" ? {fontWeight: 'bold'}: {}}>Login</Link>
+                {activeTab === routes[7] && <span></span>}
               </li>
             </>
           )}
@@ -114,6 +118,7 @@ const Navbar = (props) => {
       <Popover
         open={open}
         anchorEl={anchorEl}
+        style={{marginTop: '5px'}}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",

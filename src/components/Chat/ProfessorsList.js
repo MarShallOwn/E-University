@@ -26,7 +26,7 @@ const ProfessorsList = (props) => {
 
   return (
     <>
-      Faculty Of {user.faculty}
+      Faculty Of {user.facultyName}
       <div id="professors">{renderProfessors}</div>
     </>
   );

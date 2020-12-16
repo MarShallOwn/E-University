@@ -20,6 +20,7 @@ import ForgotPassword from "./Auth/ForgotPassword";
 import CheckMail from "./Auth/CheckMail";
 import ResetPassword from "./Auth/ResetPassword";
 import CreateFaculty from "./Admin/Faculty/CreateFaculty";
+import Faculty from "./Faculty/Faculty";
 
 //const history = createBrowserHistory()
 
@@ -46,6 +47,7 @@ const App = () => {
             <UnAuth path="/auth/reset/:resetToken" component={ResetPassword} />
             <Auth path="/chat" component={Chat} />
             <Auth path="/profile" component={Profile} />
+            <Auth path="/Faculty" component={Faculty} />
           </Switch>
         </UserProvider>
     </Router>
