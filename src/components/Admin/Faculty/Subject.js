@@ -126,8 +126,7 @@ const Subject = (props) => {
 
         </FormControl>
       </Grid>
-
-
+      
           {
             professors &&
             <Grid>

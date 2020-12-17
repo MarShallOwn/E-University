@@ -56,7 +56,12 @@ const facultySchema = new Schema({
         min: 1,
         max: 2
     },
-    departments: Array
+    departments: Array,
+    departmentsLevel: {
+        type: Number,
+        default: null,
+        max: 8
+    }
 })
 
 

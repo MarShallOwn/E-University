@@ -1,29 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Grid,
-  FormControl,
-  FormLabel,
-  Select,
-  MenuItem,
+  Grid
 } from "@material-ui/core";
-import { Controller } from "react-hook-form";
 import _ from "lodash/fp";
 import { MdAdd } from "react-icons/md";
 import Subject from "./Subject";
-
-const MUISelect = (props) => {
-  const { handleSelectChange } = props;
-  return (
-    <Select
-      defaultValue={0}
-      onChange={(e) => handleSelectChange(e)}
-      displayEmpty
-    >
-      <MenuItem value={1}>True</MenuItem>
-      <MenuItem value={0}>False</MenuItem>
-    </Select>
-  );
-};
 
 const Level = (props) => {
   const {
@@ -36,12 +17,9 @@ const Level = (props) => {
     control,
     levelData,
     professors,
+    hasDepartments,
     setValue = { setValue },
   } = props;
-
-  useEffect(() => {
-    register({ name: `levels.${level}.hasDepartments` });
-  }, [register]);
 
   const [subjectsNumber, setSubjectsNumber] = useState(() => {
     const array = [];
@@ -53,7 +31,6 @@ const Level = (props) => {
 
     return array;
   });
-  const [hasDepartments, setHasDepartments] = useState(levelData ? levelData.hasDepartments : 0);
 
   const deleteLevelField = (value) => {
     setSubjectsNumber(() =>
@@ -81,36 +58,8 @@ const Level = (props) => {
     />
   ));
 
-  /**
-   * @param {*} e
-   * handle radio change of has departments
-   */
-  const handleSelectChange = (e) => {
-    setValue(`levels.${level}.hasDepartments`, e.target.value);
-    setHasDepartments(parseInt(e.target.value));
-  };
-
-  const checkLevelHasDepartment = () => levelData.hasDepartments ? 1 : 0;
-
-
   return (
     <Grid style={activeLevel !== level ? { display: "none" } : {}}>
-      <Grid>
-        <FormControl>
-          <FormLabel>Has Departments ?</FormLabel>
-          <Select
-            name={`levels.${level}.hasDepartments`}
-            defaultValue={levelData ? checkLevelHasDepartment : 0}
-            onChange={(e) => handleSelectChange(e)}
-            displayEmpty
-            ref={register}
-          >
-            <MenuItem value={1}>True</MenuItem>
-            <MenuItem value={0}>False</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-
       <Grid>
         <p style={{ display: "inline-block" }}>Subjects</p>
         <MdAdd

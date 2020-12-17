@@ -27,9 +27,10 @@ const CreateFaculty = (props) => {
   const [activeLevel, setActiveLevel] = useState(null);
   const [departmentsNumber, setDepartmentsNumber] = useState([]);
   const [departments, setDepartments] = useState(["General"]);
+  const [departmentsLevel, setDepartmentsLevel] = useState(null)
 
   const createFaculty = (data) => {
-    data = { ...data, departments, currentTerm, name: data.name.trim() };
+    data = { ...data, departments, currentTerm, name: data.name.trim(), departmentsLevel  };
     data.levels = data.levels.filter((item) => item !== null);
 
     for (let level in data.levels) {
@@ -39,7 +40,6 @@ const CreateFaculty = (props) => {
         );
     }
 
-    console.log(data);
     Axios.post("/api/createFaculty", { data })
     .then(res => res.data.pass && props.history.push('/admin/faculties-list'));
   };
@@ -193,6 +193,30 @@ const CreateFaculty = (props) => {
           </Select>
         </FormControl>
 
+        <FormControl
+          name="levelsNumber"
+          variant="filled"
+          style={{ width: "10rem", marginTop: "1.5rem", width: '100%' }}
+        >
+          <InputLabel>Level for Departments</InputLabel>
+          <Select
+            defaultValue={null}
+            onChange={(e) => setDepartmentsLevel(e.target.value)}
+            displayEmpty
+            required
+          >
+            <MenuItem value={null}>None</MenuItem>
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={6}>6</MenuItem>
+            <MenuItem value={7}>7</MenuItem>
+            <MenuItem value={8}>8</MenuItem>
+          </Select>
+        </FormControl>
+
         <Button
           style={{ marginTop: "2rem" }}
           variant="contained"
@@ -221,6 +245,7 @@ const CreateFaculty = (props) => {
               activeLevel={activeLevel}
               control={control}
               setValue={setValue}
+              hasDepartments={(departmentsLevel <= index + 1 && departmentsLevel) ? true : false}
             />
           ))}
       </Grid>
