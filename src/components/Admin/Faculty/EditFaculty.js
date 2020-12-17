@@ -34,9 +34,10 @@ const EditFaculty = (props) => {
       return array
   });
   const [departments, setDepartments] = useState(faculty.departments);
+  const [departmentsLevel, setDepartmentsLevel] = useState(faculty.departmentsLevel)
 
   const editFaculty = (data) => {
-    data = { ...data, departments, currentTerm, name: data.name.trim() };
+    data = { ...data, departments, currentTerm, name: data.name.trim(), departmentsLevel };
     data.levels = data.levels.filter((item) => item !== null);
 
     for (let level in data.levels) {
@@ -201,6 +202,30 @@ const EditFaculty = (props) => {
           </Select>
         </FormControl>
 
+        <FormControl
+          name="levelsNumber"
+          variant="filled"
+          style={{ width: "10rem", marginTop: "1.5rem", width: '100%' }}
+        >
+          <InputLabel>Level for Departments</InputLabel>
+          <Select
+            defaultValue={departmentsLevel}
+            onChange={(e) => setDepartmentsLevel(e.target.value)}
+            displayEmpty
+            required
+          >
+            <MenuItem value={null}>None</MenuItem>
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={6}>6</MenuItem>
+            <MenuItem value={7}>7</MenuItem>
+            <MenuItem value={8}>8</MenuItem>
+          </Select>
+        </FormControl>
+
         <Button
           style={{ marginTop: "2rem" }}
           variant="contained"
@@ -231,6 +256,7 @@ const EditFaculty = (props) => {
               setValue={setValue}
               levelData={faculty.levels[index]}
               professors={faculty.professors}
+              hasDepartments={(departmentsLevel <= index + 1 && departmentsLevel) ? true : false}
             />
           ))}
       </Grid>
