@@ -29,7 +29,8 @@ const Subject = (props) => {
     level,
     control,
     subjectNumber,
-    subject
+    subject,
+    professors
   } = props;
 
   const [term, setTerm] = useState(1);
@@ -126,6 +127,47 @@ const Subject = (props) => {
         </FormControl>
       </Grid>
 
+
+          {
+            professors &&
+            <Grid>
+            <Grid style={{margin: '.5rem 0'}}>
+            <FormControl
+              variant="filled"
+              style={{ width: "10rem", marginTop: "1.5rem" }}
+            >
+              <InputLabel>Professor</InputLabel>
+              <Controller 
+              control={control}
+              name={`levels.${level}.subjects.${subjectNumber}.professor`}
+              defaultValue={_.isEmpty(subject.professor) ? {} : subject.professor}
+              as={
+                <Select
+                defaultValue={_.isEmpty(subject.professor) ? {} : subject.professor}
+                displayEmpty
+              >
+                <MenuItem value={{}}>None</MenuItem>
+                {
+                professors.map((professor, index) => (
+                  <MenuItem key={index} value={professor}>{`${professor.firstname} ${professor.lastname}`}</MenuItem>
+                ))
+                }
+              </Select>
+              }
+              />
+    
+            </FormControl>
+          </Grid>
+          {
+            !_.isEmpty(subject.professor) &&
+            <p>Current Professor: {`${subject.professor.firstname} ${subject.professor.lastname}`}</p>
+          }
+          </Grid>
+          }
+
+
+
+
       <Grid style={{margin: '2rem 0'}}>
         <FormControl>
           <FormLabel>Has Section ?</FormLabel>
@@ -188,3 +230,10 @@ const Subject = (props) => {
 };
 
 export default Subject;
+
+
+/*
+
+
+
+ */

@@ -35,6 +35,7 @@ const Level = (props) => {
     level,
     control,
     levelData,
+    professors,
     setValue = { setValue },
   } = props;
 
@@ -76,6 +77,7 @@ const Level = (props) => {
       subjectNumber={index + 1}
       control={control}
       subject={levelData ? levelData.subjects[index] : null}
+      professors={professors}
     />
   ));
 

@@ -20,6 +20,10 @@ const subjectSchema = new Schema({
         type: Number,
         required: true
     },
+    professor: {
+        type: Object,
+        default: {}
+    },
     hasSection: {
         type: Boolean,
         required: true
