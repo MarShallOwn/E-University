@@ -780,10 +780,9 @@ app.get("/api/getFacultiesNames", (req, res) => {
  */
 app.get("/api/getFacultyLevels/:facultyName", (req, res) => {
 
-  console.log(req.params.facultyName)
   facultyModel.findOne({name: req.params.facultyName}, 'levels', (err, faculty) => {
     if(err) return res.send({pass: false})
-console.log(faculty)
+
     const levelsNumber = faculty.levels.length
     return res.send({pass: true, levelsNumber})
   })
@@ -840,9 +839,12 @@ app.post("/api/facultyToBeEdited", checkAuthenticated, (req, res) => {
   facultyModel.findOne({ _id: req.body.id }, (err, faculty) => {
     if(err) return res.send({pass: false})
 
-    userModel.find({isProf: true}, "firstname lastname", (err, professors) => {
+    userModel.find({isProf: true, faculty: faculty.name}, "firstname lastname", (err, professors) => {
       if(err) return res.send({pass: false})
-      return res.send({pass: true, faculty, professors})
+
+      const copyFaculty = {...faculty._doc}
+      copyFaculty.professors = professors
+      return res.send({pass: true, faculty: copyFaculty})
     })
   })
 })

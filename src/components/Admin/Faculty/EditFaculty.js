@@ -230,6 +230,7 @@ const EditFaculty = (props) => {
               control={control}
               setValue={setValue}
               levelData={faculty.levels[index]}
+              professors={faculty.professors}
             />
           ))}
       </Grid>
