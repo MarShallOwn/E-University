@@ -47,8 +47,7 @@ const userSchema = new Schema({
     },
     department: {
         type: String,
-        trim: true,
-        required: true
+        trim: true
     },
     isActive: {
         type: Boolean,

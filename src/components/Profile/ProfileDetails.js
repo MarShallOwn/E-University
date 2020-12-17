@@ -47,7 +47,7 @@ const ProfileDetails = () => {
         <Typography display="inline" variant="body1">
           Faculty:{" "}
         </Typography>
-        {user.faculty}
+        {user.facultyName}
       </Grid>
       {!user.isProf && (
         <>
