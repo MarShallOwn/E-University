@@ -840,7 +840,10 @@ app.post("/api/facultyToBeEdited", checkAuthenticated, (req, res) => {
   facultyModel.findOne({ _id: req.body.id }, (err, faculty) => {
     if(err) return res.send({pass: false})
 
-    return res.send({pass:true, faculty})
+    userModel.find({isProf: true}, "firstname lastname", (err, professors) => {
+      if(err) return res.send({pass: false})
+      return res.send({pass: true, faculty, professors})
+    })
   })
 })
 
