@@ -139,10 +139,10 @@ const Subject = (props) => {
               <Controller 
               control={control}
               name={`levels.${level}.subjects.${subjectNumber}.professor`}
-              defaultValue={_.isEmpty(subject.professor) ? {} : subject.professor}
+              defaultValue={!subject || _.isEmpty(subject.professor) ? {} : subject.professor}
               as={
                 <Select
-                defaultValue={_.isEmpty(subject.professor) ? {} : subject.professor}
+                defaultValue={!subject || _.isEmpty(subject.professor) ? {} : subject.professor}
                 displayEmpty
               >
                 <MenuItem value={{}}>None</MenuItem>
@@ -158,7 +158,7 @@ const Subject = (props) => {
             </FormControl>
           </Grid>
           {
-            !_.isEmpty(subject.professor) &&
+            subject && !_.isEmpty(subject.professor) &&
             <p>Current Professor: {`${subject.professor.firstname} ${subject.professor.lastname}`}</p>
           }
           </Grid>

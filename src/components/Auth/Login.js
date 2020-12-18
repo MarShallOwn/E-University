@@ -5,6 +5,7 @@ import { Grid, TextField, Button } from "@material-ui/core";
 import { useUser, useLoggedIn } from "../../contexts/UserProvider";
 import { useForm } from "react-hook-form";
 import Axios from "axios";
+import loginImage from '../../assets/images/Login.jpeg'
 
 const Login = (props) => {
   const user = useUser();
@@ -51,9 +52,7 @@ const Login = (props) => {
       <Grid item xs={6}>
         <img
           style={{ width: "100%", height: "100%" }}
-          src={
-            "https://image.freepik.com/free-photo/cute-freelance-girl-using-laptop-sitting-floor-smiling_176420-20220.jpg"
-          }
+          src={loginImage}
         />
       </Grid>
       <Grid item xs={6} container alignItems="center" justify="center">

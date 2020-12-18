@@ -8,8 +8,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
-const {v4: uuidv4} = require('uuid');
-const nodemailer = require('nodemailer')
+const { v4: uuidv4 } = require("uuid");
+const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const initalizePassport = require("./passport-config");
@@ -28,27 +28,31 @@ const PORT = process.env.PORT || 8080;
 /**
  * Google OAuth config
  */
-const oauth2Client = new OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, "https://developers.google.com/oauthplayground" )
+const oauth2Client = new OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  "https://developers.google.com/oauthplayground"
+);
 
 oauth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
-const accessToken = oauth2Client.getAccessToken()
+const accessToken = oauth2Client.getAccessToken();
 
 /**
  * nodemailer config
  */
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    type: 'OAuth2',
+    type: "OAuth2",
     user: process.env.EMAIL,
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-    accessToken
-  }
-})
+    accessToken,
+  },
+});
 
 /**
  * Cloudinary Config
@@ -152,8 +156,7 @@ const checkNotAuthenticated = (req, res, next) => {
  * data entry to add users data to the database
  */
 app.post("/api/createUser", checkAuthenticated, async (req, res) => {
-
-  if(req.user.isAdmin){
+  if (req.user.isAdmin) {
     const {
       firstname,
       lastname,
@@ -161,13 +164,13 @@ app.post("/api/createUser", checkAuthenticated, async (req, res) => {
       faculty,
       level,
       department,
-      isProf
+      isProf,
     } = req.body.data;
-  
+
     if (await userModel.findOne({ nationalID })) {
       return res.send({ status: 404, message: "user already registered !" });
     }
-  
+
     const user = new userModel({
       firstname,
       lastname,
@@ -175,14 +178,14 @@ app.post("/api/createUser", checkAuthenticated, async (req, res) => {
       nationalID,
       level,
       department,
-      isProf
+      isProf,
     });
     await user.save();
-  
+
     return res.send({ status: 200, message: "user stored!" });
   }
 
-  return
+  return;
 });
 
 /**
@@ -265,18 +268,15 @@ app.get("/api/failure", (req, res) => {
  * Forgot Password token Request
  */
 app.post("/api/auth/forgotpassword", checkNotAuthenticated, (req, res) => {
+  if (!req.body.data.email) return;
 
-  if(!req.body.data.email) return 
-
-  userModel.findOne({email: req.body.data.email}, (err, user) => {
-    if(user){
-
+  userModel.findOne({ email: req.body.data.email }, (err, user) => {
+    if (user) {
       // added reset password token and expiry time
       user.resetPasswordToken = uuidv4();
       user.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
 
-      user.save()
-      .then(savedUser => {
+      user.save().then((savedUser) => {
         const link = `http://localhost:3000/auth/reset/${savedUser.resetPasswordToken}`;
 
         // send reset token password link
@@ -284,63 +284,65 @@ app.post("/api/auth/forgotpassword", checkNotAuthenticated, (req, res) => {
           from: process.env.EMAIL,
           to: savedUser.email,
           subject: "E-University: Password change request",
-          html: `<div><h2>Hi ${savedUser.firstname} ${savedUser.lastname}</h2><br><p>Please click on the following button to reset your password this button will expire after 1 hour.</p><button><a style="text-decoration:none;" href='${link}' >Click Here</a></button><p>If you did not request this, please ignore this email and your password will remain unchanged.</p></div>`
+          html: `<div><h2>Hi ${savedUser.firstname} ${savedUser.lastname}</h2><br><p>Please click on the following button to reset your password this button will expire after 1 hour.</p><button><a style="text-decoration:none;" href='${link}' >Click Here</a></button><p>If you did not request this, please ignore this email and your password will remain unchanged.</p></div>`,
         };
-  
-        transporter.sendMail(mailOptions, (err, info) => {
-          if(err) return res.send({pass: false})
-          return res.send({pass: true})
-        })
-      })
 
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) return res.send({ pass: false });
+          return res.send({ pass: true });
+        });
+      });
+    } else {
+      return res.send({ pass: false });
     }
-    else{
-      return res.send({pass: false})
-    }
-  })
-})
+  });
+});
 
 /**
  * After user changed his password using the token
  */
 app.post("/api/auth/reset/:resetToken", checkNotAuthenticated, (req, res) => {
-
-  const { password, confirmPassword } = req.body.data
+  const { password, confirmPassword } = req.body.data;
 
   if (password !== confirmPassword) {
-    return
+    return;
   }
 
-  userModel.findOne({resetPasswordToken: req.params.resetToken, resetPasswordExpires: {$gt: Date.now()}}, async (err, user) => {
-    if(!user) return res.send({pass: false})
+  userModel.findOne(
+    {
+      resetPasswordToken: req.params.resetToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    },
+    async (err, user) => {
+      if (!user) return res.send({ pass: false });
 
-    // set new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires= null;
+      // set new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
 
-    // save new password
-    user.save((err) => {
-      if(err) res.send({pass: false})
+      // save new password
+      user.save((err) => {
+        if (err) res.send({ pass: false });
 
-      // send confirmation mail
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: user.email,
-        subject: "E-University: Your Password has been changed",
-        html: `<div><h2>Hi ${user.firstname} ${user.lastname}</h2><p>This is a confirmation that the password for your account has just been changed</p></div>`
-      };
+        // send confirmation mail
+        const mailOptions = {
+          from: process.env.EMAIL,
+          to: user.email,
+          subject: "E-University: Your Password has been changed",
+          html: `<div><h2>Hi ${user.firstname} ${user.lastname}</h2><p>This is a confirmation that the password for your account has just been changed</p></div>`,
+        };
 
-      transporter.sendMail(mailOptions, (err, info) => {
-        if(err) return res.send({pass: false})
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) return res.send({ pass: false });
 
-        return res.send({pass: true})
-      })
-    })
-    
-  })
-})
+          return res.send({ pass: true });
+        });
+      });
+    }
+  );
+});
 
 /**
  * Get logged in user data
@@ -399,46 +401,68 @@ app.get("/api/logout", (req, res) => {
 /**
  * Update User's Profile Image
  */
-app.post('/api/updateImage', upload.single("myFile"), checkAuthenticated, (req, res) => {
-  cloudinary.uploader.upload(req.file.path, {
-      folder: "e-university-profile-pictures",
-      use_filename: true
-  },
-  (err, result) => {
-      if(!err){
-          userModel.findOneAndUpdate({email: req.user.email}, { $set: {picture: result.public_id} }).exec((err, user) => {
-              if(!err){
-                  user.picture !== 'e-university-profile-pictures/default-image_qtdxwi' && cloudinary.uploader.destroy(user.picture.split('.')[0], (err, result) => err && console.log(err))
-                  roomModel.find(
-                      {participants: {
-                          $all: [{
-                              $elemMatch: {
-                                  email: req.user.email
-                              }
-                          }]
-                      }
-                  }).exec(async (err, rooms) => {
-                      if(rooms.length !== 0){
-                          for(const room of rooms){
-                              for(const i in room.participants){
-                                  if(room.participants[i].email === req.user.email){
-                                      room.participants[i] = {
-                                          ...room.participants[i],
-                                          picture: result.public_id,
-                                      }
-                                  }
-                              }
-                              await room.markModified('participants');
-                              await room.save();
-                          }
-                      }
-                      return res.send({result: result.public_id, pass: true})
+app.post(
+  "/api/updateImage",
+  upload.single("myFile"),
+  checkAuthenticated,
+  (req, res) => {
+    cloudinary.uploader.upload(
+      req.file.path,
+      {
+        folder: "e-university-profile-pictures",
+        use_filename: true,
+      },
+      (err, result) => {
+        if (!err) {
+          userModel
+            .findOneAndUpdate(
+              { email: req.user.email },
+              { $set: { picture: result.public_id } }
+            )
+            .exec((err, user) => {
+              if (!err) {
+                user.picture !==
+                  "e-university-profile-pictures/default-image_qtdxwi" &&
+                  cloudinary.uploader.destroy(
+                    user.picture.split(".")[0],
+                    (err, result) => err && console.log(err)
+                  );
+                roomModel
+                  .find({
+                    participants: {
+                      $all: [
+                        {
+                          $elemMatch: {
+                            email: req.user.email,
+                          },
+                        },
+                      ],
+                    },
                   })
+                  .exec(async (err, rooms) => {
+                    if (rooms.length !== 0) {
+                      for (const room of rooms) {
+                        for (const i in room.participants) {
+                          if (room.participants[i].email === req.user.email) {
+                            room.participants[i] = {
+                              ...room.participants[i],
+                              picture: result.public_id,
+                            };
+                          }
+                        }
+                        await room.markModified("participants");
+                        await room.save();
+                      }
+                    }
+                    return res.send({ result: result.public_id, pass: true });
+                  });
               }
-          })
+            });
+        }
       }
-  })
-})
+    );
+  }
+);
 
 /**
  * Update user's Profile details
@@ -446,54 +470,56 @@ app.post('/api/updateImage', upload.single("myFile"), checkAuthenticated, (req, 
 app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
   const { street, city, phoneNumber } = req.body.data;
 
-  userModel.findOneAndUpdate({email: req.user.email}, {street, city, phoneNumber}, (err, user) => {
-    if(user){
-      return res.send({pass:true})
+  userModel.findOneAndUpdate(
+    { email: req.user.email },
+    { street, city, phoneNumber },
+    (err, user) => {
+      if (user) {
+        return res.send({ pass: true });
+      }
+      return;
     }
-    return
-  })
-})
+  );
+});
 
 /**
  * Change user's password
  */
 app.post("/api/auth/changePassword", checkAuthenticated, (req, res) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body.data;
 
-  const { currentPassword, newPassword, confirmPassword } = req.body.data
+  if (newPassword !== confirmPassword) return;
 
-  if(newPassword !== confirmPassword) return
+  userModel.findOne({ email: req.user.email }, async (err, user) => {
+    if (!user) return;
 
-  userModel.findOne({email: req.user.email}, async (err, user) => {
-    if(!user) return
-
-    if(await bcrypt.compare(currentPassword, user.password)){
+    if (await bcrypt.compare(currentPassword, user.password)) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
-      user.save()
+      user.save();
 
-      return res.send({pass: true})
+      return res.send({ pass: true });
     }
-    return res.send({pass: false})
-  })
-
-})
+    return res.send({ pass: false });
+  });
+});
 
 /**
  *  Change Email
  */
 app.post("/api/auth/changeEmail", checkAuthenticated, (req, res) => {
-  const { email } = req.body.data
+  const { email } = req.body.data;
 
-  if(!email) return
+  if (!email) return;
 
-  userModel.findOne({email: req.user.email}, (err, user) => {
-    if(!user) return
+  userModel.findOne({ email: req.user.email }, (err, user) => {
+    if (!user) return;
 
-    user.email = email
-    user.save()
-    return res.send({pass: true})
-  })
-})
+    user.email = email;
+    user.save();
+    return res.send({ pass: true });
+  });
+});
 
 /**
  * Get the users details other than the room itself
@@ -533,7 +559,7 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
               isActive,
               faculty,
               level,
-              isProf
+              isProf,
             } = await userModel.findOne({ email: participant.email }).exec();
             const displayname = `${firstname} ${lastname}`;
             users.push({
@@ -546,7 +572,7 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
               isActive,
               faculty,
               level,
-              isProf
+              isProf,
             });
           }
         }
@@ -559,13 +585,13 @@ app.get("/api/contacts", checkAuthenticated, (req, res) => {
  * Get the List of all the professors that are from the same faculty as the user
  */
 app.get("/api/professors", checkAuthenticated, (req, res) => {
-  userModel.find({isProf: true, faculty: req.user.faculty}, (err, doc) => {
-    if(doc){
+  userModel.find({ isProf: true, faculty: req.user.faculty }, (err, doc) => {
+    if (doc) {
       const professors = [];
       let professor;
 
-      for(const prof of doc){
-        if(prof.email){
+      for (const prof of doc) {
+        if (prof.email) {
           const {
             firstname,
             lastname,
@@ -590,16 +616,16 @@ app.get("/api/professors", checkAuthenticated, (req, res) => {
             faculty,
             level,
           };
-  
-          professors.push(professor)
+
+          professors.push(professor);
         }
       }
 
       return res.send({ professors, pass: true });
     }
-    return res.send({pass: false})
-  })
-})
+    return res.send({ pass: false });
+  });
+});
 
 /**
  * get the user that is searched for
@@ -621,7 +647,7 @@ app.get("/api/chat/search", checkAuthenticated, (req, res) => {
         department,
         faculty,
         level,
-        isProf
+        isProf,
       } = user;
       const displayname = `${firstname} ${lastname}`;
       userRes = {
@@ -634,7 +660,7 @@ app.get("/api/chat/search", checkAuthenticated, (req, res) => {
         department,
         faculty,
         level,
-        isProf
+        isProf,
       };
       return res.send({ user: userRes, pass: true });
     }
@@ -692,14 +718,14 @@ app.post("/api/chat/room", checkAuthenticated, (req, res) => {
                   displayname: `${req.user.firstname} ${req.user.lastname}`,
                   picture: req.user.picture,
                   isActive: req.user.isActive,
-                  isProf: req.user.isProf
+                  isProf: req.user.isProf,
                 },
                 {
                   email: otherUser.email,
                   displayname: `${otherUser.firstname} ${otherUser.lastname}`,
                   picture: otherUser.picture,
                   isActive: otherUser.isActive,
-                  isProf: otherUser.isProf
+                  isProf: otherUser.isProf,
                 },
               ],
               createdAt,
@@ -752,124 +778,232 @@ app.post("/api/sendMessage", checkAuthenticated, (req, res) => {
 });
 
 app.post("/api/createFaculty", async (req, res) => {
-  const { data } = req.body
+  const { data } = req.body;
 
-
-  const faculty = new facultyModel({...data});
+  const faculty = new facultyModel({ ...data });
 
   await faculty.save((err, result) => {
-    if(err) return res.send({pass: false})
+    if (err) return res.send({ pass: false });
 
-    return res.send({pass: true})
-  })
-})
+    return res.send({ pass: true });
+  });
+});
 
 /**
  * Get list of faculties name
  */
 app.get("/api/getFacultiesNames", (req, res) => {
-  facultyModel.find({},'name departments', (err, faculties) => {
-    if(err) return res.send({pass: false})
+  facultyModel.find({}, "name departments", (err, faculties) => {
+    if (err) return res.send({ pass: false });
 
-    return res.send({pass: true, faculties})
-  })
-})
+    return res.send({ pass: true, faculties });
+  });
+});
 
 /**
  * Get number levels of the selected Faculties
  */
 app.get("/api/getFacultyLevels/:facultyName", (req, res) => {
+  facultyModel.findOne(
+    { name: req.params.facultyName },
+    "levels",
+    (err, faculty) => {
+      if (err) return res.send({ pass: false });
 
-  facultyModel.findOne({name: req.params.facultyName}, 'levels', (err, faculty) => {
-    if(err) return res.send({pass: false})
-
-    const levelsNumber = faculty.levels.length
-    return res.send({pass: true, levelsNumber})
-  })
-})
+      const levelsNumber = faculty.levels.length;
+      return res.send({ pass: true, levelsNumber });
+    }
+  );
+});
 
 /**
  * Checks if the selected level of the selected Faculty has departments or not and if it has then returns the list of the departments
  */
-app.get("/api/checkLevelHasDepartment/:selectedFaculty/:selectedLevel", (req, res) => {
-  const {selectedFaculty, selectedLevel} = req.params
-  facultyModel.findOne({name: selectedFaculty}, (err , faculty) => {
+app.get(
+  "/api/checkLevelHasDepartment/:selectedFaculty/:selectedLevel",
+  (req, res) => {
+    const { selectedFaculty, selectedLevel } = req.params;
+    facultyModel.findOne({ name: selectedFaculty }, (err, faculty) => {
+      if (err) return res.send({ pass: false });
 
-    if(err) return res.send({pass: false})
+      const departments = faculty.levels[selectedLevel - 1].hasDepartments
+        ? faculty.departments
+        : [];
 
-    const departments = faculty.levels[selectedLevel-1].hasDepartments ? faculty.departments : [];
-
-    return res.send({pass: true, departments})
-  })
-})
+      return res.send({ pass: true, departments });
+    });
+  }
+);
 
 /**
  * Get the faculty that the user is enrolled in
  */
 app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
+  facultyModel.findOne({ name: req.user.faculty }, (err, doc) => {
+    if (err) return res.send({ pass: false });
 
-  facultyModel.findOne({name: req.user.faculty}, (err, doc) => {
-    if(err) return res.send({pass: false})
+    const { name, currentTerm, creditHours } = doc;
 
-    const {name, currentTerm, creditHours} = doc
+    const level = doc.levels[req.user.level - 1];
+    const faculty = {
+      name,
+      currentTerm,
+      creditHours,
+      level,
+      department: req.user.department,
+    };
 
-    const level = doc.levels[req.user.level - 1]
-    const faculty = {name, currentTerm, creditHours, level, department: req.user.department}
-
-    return res.send({pass: true, faculty})
-  })
-})
+    return res.send({ pass: true, faculty });
+  });
+});
 
 /**
  *  Get all Faculties in an array to be shown in a list
  */
 app.get("/api/allFaculties", (req, res) => {
-
   facultyModel.find({}, "name", (err, faculties) => {
-    if(err) return res.send({pass: false})
+    if (err) return res.send({ pass: false });
 
-    return res.send({pass: true, faculties})
-  })
-})
+    return res.send({ pass: true, faculties });
+  });
+});
 
 /**
  * Get selected faculty to be edited
  */
 app.post("/api/facultyToBeEdited", checkAuthenticated, (req, res) => {
   facultyModel.findOne({ _id: req.body.id }, (err, faculty) => {
-    if(err) return res.send({pass: false})
+    if (err) return res.send({ pass: false });
 
-    userModel.find({isProf: true, faculty: faculty.name}, "firstname lastname", (err, professors) => {
-      if(err) return res.send({pass: false})
+    userModel.find(
+      { isProf: true, faculty: faculty.name },
+      "firstname lastname",
+      (err, professors) => {
+        if (err) return res.send({ pass: false });
 
-      const copyFaculty = {...faculty._doc}
-      copyFaculty.professors = professors
-      return res.send({pass: true, faculty: copyFaculty})
-    })
-  })
-})
+        const copyFaculty = { ...faculty._doc };
+        copyFaculty.professors = professors;
+        return res.send({ pass: true, faculty: copyFaculty });
+      }
+    );
+  });
+});
 
 /**
  * Edit Faculty
  */
-app.post("/api/editFaculty", (req, res) => {
-  const { data, id } = req.body
+app.post("/api/editFaculty", checkAuthenticated, (req, res) => {
+  const { data, id } = req.body;
 
-  facultyModel.findOneAndUpdate({_id: id}, {...data}, (err, faculty) => {
-    if(err) return res.send({pass: false})
+  facultyModel.findOneAndUpdate({ _id: id }, { ...data }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
 
-    if(faculty.name !== data.name){
-      userModel.updateMany({faculty: faculty.name}, {faculty: data.name}, (err, users) => {
-        if(err) return res.send({pass: false})
-  
-        return res.send({pass: true})
-      })
+    if (faculty.name !== data.name) {
+      userModel.updateMany(
+        { faculty: faculty.name },
+        { faculty: data.name },
+        (err, users) => {
+          if (err) return res.send({ pass: false });
+
+          return res.send({ pass: true });
+        }
+      );
+    } else {
+      return res.send({ pass: true });
     }
-    else{
-      return res.send({pass: true})
-    }
-
   });
-})
+});
+
+/**
+ * Get Subjects that the professor is teaching only
+ */
+app.get("/api/professorSubjects", checkAuthenticated, (req, res) => {
+  const { _id } = req.user;
+  facultyModel.findOne(
+    { "levels.subjects.professor._id": req.user._id.toString() },
+    (err, faculty) => {
+      let subjects = [];
+      let pushObject = {};
+
+      for (let index in faculty.levels) {
+        pushObject.subjects = faculty.levels[index].subjects.filter(
+          (subject) => subject.professor._id === _id.toString()
+        );
+
+        if (pushObject.subjects.length !== 0) {
+          pushObject.level = parseInt(index) + 1;
+          subjects.push(pushObject);
+          pushObject = {};
+        }
+      }
+
+      console.log(subjects);
+
+      return res.send({ subjects });
+    }
+  );
+});
+
+app.get("/api/profStudents", checkAuthenticated, (req, res) => {
+  const faculty = {};
+
+  userModel.find(
+    { faculty: req.user.faculty, isProf: false },
+    "firstname lastname email level department picture city",
+    (err, users) => {
+      if (err) return res.send({ pass: false });
+
+      facultyModel.findOne(
+        { name: req.user.faculty },
+        "levels departments",
+        (err, doc) => {
+          if (err) return res.send({ pass: false });
+
+          faculty.levels = doc.levels.length;
+          faculty.departments = doc.departments;
+          return res.send({ pass: true, users, faculty });
+        }
+      );
+    }
+  );
+});
+
+app.post("/api/filterStudents", checkAuthenticated, (req, res) => {
+  const { filter: filtersData } = req.body;
+
+  for (let filterData in filtersData) {
+    if (filterData !== "level") {
+      filtersData[filterData] = {
+        $regex: "^" + filtersData[filterData].value,
+        $options: "i",
+      };
+    } else {
+      filtersData[filterData] = filtersData[filterData].value;
+    }
+  }
+
+  userModel.find(
+    { faculty: req.user.faculty, isProf: false, ...filtersData },
+    "firstname lastname email level department picture city",
+    (err, users) => {
+      return res.send({ pass: true, users });
+    }
+  );
+});
+
+/**
+ * Returns details of selected Student
+ */
+app.post("/api/studentDetails", checkAuthenticated, (req, res) => {
+  userModel.findOne(
+    { _id: req.body._id },
+    "firstname lastname email level department picture city faculty phoneNumber street",
+    (err, student) => {
+      if (err) return res.send({ pass: false });
+
+      return res.send({ pass: true, student });
+    }
+  );
+});
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

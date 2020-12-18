@@ -1,12 +1,17 @@
-import React, { useEffect } from "react";
+import React from "react";
 import _ from "lodash";
 import { Grid } from "@material-ui/core";
 import { useUser } from "../contexts/UserProvider";
 import Footer from "./Footer";
 import "./styleHome.css";
+import smilingStudent from '../assets/images/young-attractive-smiling-student-showing-thumb-up-outdoors-campus-university.jpg'
+import hipstermale from '../assets/images/portrait-delighted-hipster-male-student-with-crisp-hair.jpg'
+import recommendation from '../assets/images/Recommendation.jpeg'
 
 const Home = () => {
   const user = useUser();
+
+  console.log(user)
 
   return (
     <Grid>
@@ -25,9 +30,7 @@ const Home = () => {
             objectFit: "fill",
             backgroundOrigin: "padding-box",
           }}
-          src={
-            "https://img.freepik.com/free-photo/young-attractive-smiling-student-showing-thumb-up-outdoors-campus-university_8353-6394.jpg?size=626&ext=jpg"
-          }
+          src={smilingStudent}
         />
         <Grid
           style={{
@@ -137,9 +140,7 @@ const Home = () => {
               top: "163px",
               right: "95px",
             }}
-            src={
-              "https://project-house.net/wp-content/uploads/2019/07/Black-Boys-Verastic.jpg"
-            }
+            src={hipstermale}
           />
           <div
             style={{
@@ -196,14 +197,16 @@ const Home = () => {
             width: "100%",
             height: "510px",
             background:
-              "transparent url(https://image.freepik.com/free-photo/portrait-young-happy-blogger-with-modern-laptop-outdoors_231208-2070.jpg) 0% 0% no-repeat padding-box cover",
-            backgroundSize: "cover"
+              `url(${recommendation}) 0% 0% no-repeat padding-box`,
+            backgroundSize: "cover",
           }}
         >
+          <div style={{height: '100%', width: '100%', backgroundColor: '#2C4563', opacity: '0.31'}}></div>
           <p
             style={{
               maxHeight: "994px",
               height: "188px",
+              width: '994px',
               position: "absolute",
               top: "156px",
               left: "186px",
