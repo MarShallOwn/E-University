@@ -9,9 +9,6 @@ const Faculty = () => {
 
   const [faculty, setFaculty] = useState({level: {subjects: []}});
 
-  console.log(faculty);
-  console.log(faculty.level.subjects)
-
   useEffect(() => {
     Axios.get("/api/getUserFaculty").then(
       (res) => res.data.pass && setFaculty(res.data.faculty)

@@ -27,6 +27,7 @@ const FacultiesList = props => {
     <Grid className={classes.table}>
       <div style={{ overflowX: "auto" }}>
         <table>
+          <tbody>
           <tr>
             <th>Name</th>
             <th></th>
@@ -37,6 +38,7 @@ const FacultiesList = props => {
               <td><MdModeEdit id={faculty._id} onClick={handleEdit} /></td>
             </tr>
           ))}
+          </tbody>
         </table>
       </div>
     </Grid>

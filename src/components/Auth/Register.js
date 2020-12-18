@@ -5,6 +5,7 @@ import { useUser } from "../../contexts/UserProvider";
 import { useForm } from "react-hook-form";
 import Axios from "axios";
 import { useStyles } from './style'
+import nationalIDIcon from '../../assets/images/National-ID.svg'
 
 const Register = (props) => {
   const user = useUser();
@@ -33,7 +34,7 @@ const Register = (props) => {
 
   return (
     <Grid className={classes.root} container alignItems="center" justify="center" direction="column" style={{ height: "calc(100vh - 3.5rem)" }}>
-        <div style={{height: '222px', width: '222px', borderRadius: '50%', backgroundColor: 'grey', marginBottom: '39.5px'}}></div>
+        <img src={nationalIDIcon} style={{height: '222px', width: '222px', borderRadius: '50%', backgroundColor: 'grey', marginBottom: '39.5px'}} />
       <p style={{
           lineHeight: '0',
           fontWeight: '500',
