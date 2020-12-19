@@ -7,6 +7,7 @@ import ChatRoom from "./ChatRoom";
 import io from "socket.io-client";
 import ProfessorsList from "./ProfessorsList";
 import ListContainer from "./ListContainer";
+import { MdExpandLess, MdExpandMore } from "react-icons/md";
 
 const Chat = (props) => {
   const [room, setRoom] = useState(null);
@@ -61,26 +62,79 @@ const Chat = (props) => {
   }, []);
 
   return (
-    <Grid container>
-      <Grid item xs={3}>
-        <Link to="/profile">Profile</Link>
-        <Button
-          onClick={() => setShowProfessors(!showProfessors)}
-          variant="contained"
-          color="primary"
+    <Grid
+      container
+      justify="center"
+      alignItems="center"
+      style={{ width: "100%", height: "calc(100vh - 3.5rem)" }}
+    >
+      <Grid
+        item
+        style={{
+          width: "1109px",
+          height: "672px",
+          border: "1px solid #9696A0",
+          borderRadius: "10px",
+        }}
+      >
+        <Grid
+          item
+          style={{
+            float: "left",
+            minWidth: "calc(100% - 825.5px)",
+            height: "100%",
+          }}
         >
-          {showProfessors ? "Contacts" : "Professors"}
-        </Button>
-        <ListContainer>
-          {showProfessors ? (
-            <ProfessorsList openRoom={openRoom} professors={professors} />
+          <ListContainer>
+            <div style={{ height: "89px", borderBottom: "1px solid black" }}>
+              <div
+                style={{
+                  font: "normal normal 600 18px/27px Poppins",
+                  color: "#2C4563",
+                  fontSize: "18px",
+                }}
+                onClick={() => setShowProfessors(!showProfessors)}
+              >
+                <p style={{ margin: "0", display: "inline-block", marginLeft: '13px',
+                  marginTop: '15px' }}>
+                  {showProfessors ? "Contacts" : "Professors"}
+                </p>
+                <MdExpandMore />
+              </div>
+            </div>
+
+            <div
+              style={{
+                height: "calc(100% - 180px)",
+                paddingBottom: "-180px",
+                overflowY: "auto",
+                overflowX: "hidden",
+              }}
+            >
+              {showProfessors ? (
+                <ProfessorsList openRoom={openRoom} professors={professors} />
+              ) : (
+                <UserContact openRoom={openRoom} contacts={contacts} />
+              )}
+            </div>
+          </ListContainer>
+        </Grid>
+        <Grid
+          item
+          style={{
+            float: "right",
+            width: "825.5px",
+            height: "100%",
+          }}
+        >
+          {room ? (
+            <ChatRoom socket={socket} room={room} />
           ) : (
-            <UserContact openRoom={openRoom} contacts={contacts} />
+            <Grid container justify="center" alignItems="center" style={{width: '100%', height: '100%', font: 'normal normal normal 18px/5px Poppins', }}>
+              Select a Contact to Start Chatting
+            </Grid>
           )}
-        </ListContainer>
-      </Grid>
-      <Grid item xs={9}>
-        {room && <ChatRoom socket={socket} room={room} />}
+        </Grid>
       </Grid>
     </Grid>
   );
