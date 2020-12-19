@@ -12,20 +12,26 @@ const Messages = (props) => {
 
   const style = {
     container: {
-      height: "50vh",
+      height: "calc(100% - 180px)",
       overflowY: "auto",
     },
     rightMessage: {
       float: "right",
-      marginRight: "20px",
       display: "block",
       clear: "both",
+      backgroundColor: '#1C60B3',
+      borderRadius: '32px',
+      padding: '8px 20px',
+      margin: '5px 20px 5px 0px'
     },
     leftMessage: {
       float: "left",
-      marginRight: "20px",
       display: "block",
       clear: "both",
+      backgroundColor: '#9696A0',
+      borderRadius: '32px',
+      padding: '8px 20px',
+      margin: '5px 20px 5px 20px'
     },
   };
 

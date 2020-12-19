@@ -43,7 +43,7 @@ const userSchema = new Schema({
     picture: {
         type: String,
         trim: true,
-        default: 'chat-app-profile-pictures/default-image_qtdxwi'
+        default: 'e-university-profile-pictures/default-image_qtdxwi'
     },
     department: {
         type: String,

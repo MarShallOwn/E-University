@@ -18,16 +18,18 @@ const ProfessorsList = (props) => {
         id={professor.email}
         style={styles.tab}
       >
-        <p>Dr. {professor.displayname}</p>
-        <p>{professor.email}</p>
+        <p style={{font: 'normal normal bold 16px/18px Poppins', color: '#424446', fontSize: '16px'}}>Dr. {professor.displayname}</p>
+        <p style={{color: '#9696A0', font: 'normal normal bold 14px/12px Poppins'}}>{professor.email}</p>
       </Grid>
     );
   });
 
   return (
     <>
-      Faculty Of {user.facultyName}
-      <div id="professors">{renderProfessors}</div>
+    <div style={{margin: '0 13px', textAlign: 'center'}}>
+    <p style={{font: 'normal normal bold 17px/18px Poppins', color: '#424446', fontSize: '17px'}}>Faculty Of {user.faculty}</p>
+    </div>
+      <div id="professors" style={{marginTop: '30px'}}>{renderProfessors}</div>
     </>
   );
 };
@@ -38,10 +40,8 @@ const styles = {
   tab: {
     cursor: "pointer",
     lineHeight: ".4rem",
-    margin: "1rem .2rem",
-    paddingLeft: ".5rem",
-    border: "1px solid black",
-    width: "75%",
-    borderRadius: "10px",
+    margin: "1rem 0",
+    width: "99%",
+    paddingLeft: '13px',
   },
 };

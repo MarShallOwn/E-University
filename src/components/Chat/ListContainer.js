@@ -6,19 +6,11 @@ const ListContainer = ({ children }) => {
   const user = useUser();
 
   return (
-    <Grid>
-      <div style={{ marginBottom: "20px" }} id="profile-mini-card">
-        <img
-          style={{ height: "2rem" }}
-          src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${user.picture}`}
-        />
-        <h4 style={{ display: "inline-block" }}>
-          {user.isProf && "Dr. "}
-          {user && `${user.firstname} ${user.lastname}`}
-        </h4>
-      </div>
+    <Grid style={{height: '100%', position: 'relative', borderRight: '1px solid black', width: '100%'}}>
       {children}
-      <p style={{ marginTop: "20%" }}>E-mail: {user && user.email}</p>
+      <Grid container alignItems="center" style={{height: '91px', borderTop: '1px solid black', position: 'absolute', bottom: '0', margin: '0', width: '100%', padding: '0 13px' }}>
+          <p style={{color: '#2C4563', font: 'normal normal 600 14px/25px Poppins', fontSize: '14px'}}>E-mail: <span style={{color: '#707070', font: 'normal normal 400 14px/25px Poppins'}}>{user && user.email}</span></p>
+      </Grid>
     </Grid>
   );
 };

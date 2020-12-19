@@ -14,8 +14,8 @@ const Message = (props) => {
 
   return (
     <Grid style={style}>
-      <p>{newMessage}</p>
-      <div style={{ marginBottom: "20px" }}>
+      <p style={{margin: '0', color:'white'}}>{newMessage}</p>
+      <div>
         {/* (direction === "right" && !isDeleted) && <MessageSettings messageId={id} /> */}
       </div>
     </Grid>

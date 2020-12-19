@@ -3,7 +3,7 @@ import { Grid, TextField, InputAdornment } from "@material-ui/core";
 import _ from "lodash/fp";
 import { useUser } from "../../contexts/UserProvider";
 import { useForm } from "react-hook-form";
-import { MdClear } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
 import Axios from "axios";
 
 const UserContact = (props) => {
@@ -75,14 +75,14 @@ const UserContact = (props) => {
         id={contact.email}
         style={styles.tab}
       >
-        <p>
+        <p style={{font: 'normal normal bold 16px/18px Poppins', color: '#424446', fontSize: '16px'}}>
           {contact.isProf && "Dr. "}
           {contact.displayname}{" "}
           {contact.isProf && (
             <span style={styles.professorContainer}>Professor</span>
           )}
         </p>
-        <p>{contact.email}</p>
+        <p style={{color: '#9696A0', font: 'normal normal bold 14px/12px Poppins'}}>{contact.email}</p>
       </Grid>
     );
   });
@@ -101,7 +101,8 @@ const UserContact = (props) => {
       {_.get("email.type", errors) === "pattern" && (
         <p>Please include an '@' in the email address and write the domain</p>
       )}
-      <div id="input-section">
+      <div id="input-section" style={{display: 'flex', justifyContent: 'center', position: 'absolute', top: '50px', width: 'calc(100% - 26px)',
+    left: '50%', transform: 'translate(-50%, 0)'}}>
         <TextField
           variant="outlined"
           size="small"
@@ -110,6 +111,22 @@ const UserContact = (props) => {
           id="emailSearch"
           value={searchInput}
           label="Search by E-mail"
+          /* styles the wrapper */
+          style={{ height: "29px", width: '100%' }}
+          /* styles the label component */
+          InputLabelProps={{
+            style: {
+              height: "29px",
+              top: `-5px`,
+            },
+          }}
+          /* styles the input component */
+          inputProps={{
+            style: {
+              height: "29px",
+              padding: "0 14px",
+            },
+          }}
           onChange={handleSearchInput}
           inputRef={register({
             required: true,
@@ -119,10 +136,11 @@ const UserContact = (props) => {
             endAdornment: (
               <>
                 {searchInput !== "" && (
-                  <InputAdornment onClick={() => setSearchInput("")}>
-                    <MdClear
+                  <InputAdornment onClick={handleSubmit(emailSearchHandle)}>
+                    <MdSearch
                       fontSize="1.2rem"
                       style={{
+                        transform: "scale(-1, 1)",
                         backgroundColor: "black",
                         borderRadius: "5px",
                         cursor: "pointer",
@@ -137,9 +155,8 @@ const UserContact = (props) => {
           onKeyPress={emailSearchKeyPressHandle}
           placeholder="Search for user"
         />
-        <button onClick={handleSubmit(emailSearchHandle)}>Search</button>
       </div>
-      <div id="users">{renderResult}</div>
+      <div id="users" style={{marginTop: '30px'}}>{renderResult}</div>
     </>
   );
 };
@@ -162,11 +179,9 @@ const styles = {
   tab: {
     cursor: "pointer",
     lineHeight: ".4rem",
-    margin: "1rem .2rem",
-    paddingLeft: ".5rem",
-    border: "1px solid black",
-    width: "75%",
-    borderRadius: "10px",
+    margin: "1rem 0",
+    width: "99%",
+    paddingLeft: '13px',
   },
   professorContainer: {
     color: "white",
@@ -174,5 +189,7 @@ const styles = {
     backgroundColor: "purple",
     padding: ".2rem",
     borderRadius: "5px",
+    fontSize: '13px',
+    font: "normal normal bold 13px/18px Poppins",
   },
 };
