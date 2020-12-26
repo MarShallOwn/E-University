@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Grid } from '@material-ui/core'
 import Axios from 'axios'
 
-const Subjects = () => {
+const Subjects = props => {
 
     const [levels, setLevels] = useState([])
 
@@ -13,6 +13,25 @@ const Subjects = () => {
 
       console.log(levels);
 
+    const handleClick = e => {
+        let subject;
+        let levelNumber;
+        
+        for(let level of levels){
+            subject = level.subjects.find( subject => subject._id === e.currentTarget.id )
+            
+            
+            if(subject){
+                levelNumber = level.level;
+            } break;
+        }
+
+        props.history.push({
+            pathname : '/professor/subject',
+            state : { subjectId: subject._id, level : levelNumber }
+        })
+    }
+
     return(
         <Grid>
             {
@@ -21,7 +40,7 @@ const Subjects = () => {
                         <p>Level {level.level}</p>
                         {
                         level.subjects.map((subject, index) => (
-                            <Grid onClick={() => {}} container alignItems="center" key={index} id={subject._id} style={{margin: '20px 0', width: '300px', height: '50px', marginLeft: '20px', border: '1px solid black', borderRadius: '10px'}}>
+                            <Grid onClick={handleClick} container alignItems="center" key={index} id={subject._id} style={{margin: '20px 0', width: '300px', height: '50px', marginLeft: '20px', border: '1px solid black', borderRadius: '10px'}}>
                                 <p>{subject.name}</p>
                             </Grid>
                         ))

@@ -937,12 +937,159 @@ app.get("/api/professorSubjects", checkAuthenticated, (req, res) => {
         }
       }
 
-      console.log(subjects);
-
       return res.send({ subjects });
     }
   );
 });
+
+/**
+ * Get Subject that the professor selected
+ */
+app.post("/api/professor/get-subject", checkAuthenticated, (req, res) => {
+  const { subjectId, level: frontLevel } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+    const docLevel = faculty.levels.find(
+      (level, index) => index === frontLevel - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    return res.send({ pass: true, subject: docSubject });
+  });
+});
+
+/**
+ * Create lecture for the current subject in the specific level
+ */
+app.post("/api/professor/create-lecture", checkAuthenticated, (req, res) => {
+  const { newLecture, level: frontLevel, subject: frontSubject } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+    const docLevel = faculty.levels.find(
+      (level, index) => index === frontLevel - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject.name === frontSubject.name
+    );
+
+    if (
+      docSubject.lectures.find(
+        (lecture) => lecture.lectureNumber === newLecture
+      )
+    )
+      return res.send({ pass: false });
+
+    docSubject.lectures.push({
+      lectureNumber: newLecture,
+      materials: [],
+    });
+
+    faculty.save();
+
+    return res.send({ pass: true, subject: docSubject });
+  });
+});
+
+/**
+ * Create lecture for the current subject in the specific level
+ */
+app.post("/api/professor/delete-lecture", checkAuthenticated, (req, res) => {
+  const { deleteLecture, level: frontLevel, subject: frontSubject } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+    const docLevel = faculty.levels.find(
+      (level, index) => index === frontLevel - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject.name === frontSubject.name
+    );
+
+    const lectureIndex = docSubject.lectures.findIndex(
+      (lecture) => lecture.lectureNumber === deleteLecture
+    );
+
+    docSubject.lectures.splice(lectureIndex, 1);
+
+    faculty.save();
+
+    return res.send({ pass: true, subject: docSubject });
+  });
+});
+
+const videoOrFileUpload = (req, res, frontLevel, subjectId, frontLecture, newMaterial, result = null) => {
+  facultyModel.find({ faculty: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+    
+    const docLevel = faculty.levels.find(
+      (level, index) => index === frontLevel - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    const docLecture = docSubject.lectures.find(
+      (lecture) => lecture._id.toString() === frontLecture._id
+    );
+
+    docLecture.materials.push(
+      newMaterial.type === "video"
+        ? {
+            type: newMaterial.type,
+            name: newMaterial.name,
+            link: newMaterial.link,
+          }
+        : {
+            type: newMaterial.type,
+            name: newMaterial.name,
+            fileName: result.public_id,
+          }
+    );
+
+    faculty.save();
+
+    return res.send({ pass: true, subject: docLecture });
+  });
+}
+
+app.post(
+  "/api/professor/lecture/create-material",
+  upload.single("myFile"),
+  (req, res) => {
+    const {
+      newMaterial,
+      lecture: frontLecture,
+      level: frontLevel,
+      subjectId,
+    } = req.body;
+
+    if(req.file && newMaterial.type === "file"){
+    cloudinary.uploader.upload(
+      req.file.path,
+      {
+        folder: "e-university-profile-pictures",
+        use_filename: true,
+      },
+      (err, result) => {
+        if (err) return res.send({ pass: false });
+
+        videoOrFileUpload(req, res, frontLevel, subjectId, frontLecture, newMaterial, result);
+      }
+    );
+  }
+  else{
+    videoOrFileUpload(req, res, frontLevel, subjectId, frontLecture, newMaterial);
+  }
+  }
+);
 
 app.get("/api/profStudents", checkAuthenticated, (req, res) => {
   const faculty = {};
