@@ -1,10 +1,26 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-const weekSchema = new Schema({
-    pdf: Array,
-    powerpoint: Array,
-    videoLinks: Array
+const materialSchema = new Schema({
+    type: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    fileName: String,
+    link: String
+})
+
+const lectureSchema = new Schema({
+    lectureNumber: {
+        type: Number,
+        required: true,
+        unique: true,
+    },
+    materials: [materialSchema]
 })
 
 const subjectSchema = new Schema({
@@ -29,7 +45,7 @@ const subjectSchema = new Schema({
         required: true
     },
     departments: Array,
-    weeks: [weekSchema]
+    lectures: [lectureSchema]
 })
 
 const levelSchema = new Schema({

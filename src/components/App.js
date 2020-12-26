@@ -24,8 +24,10 @@ import Faculty from "./Faculty/Faculty";
 import FacultiesList from "./Admin/Faculty/FacultiesList"
 import EditFaculty from "./Admin/Faculty/EditFaculty";
 import Subjects from "./Professor/Subjects";
+import Subject from "./Professor/Subject";
 import UsersList from "./Professor/UsersList";
 import StudentDetails from "./Professor/StudentDetails";
+import Professor from "./Professor/Professor";
 
 //const history = createBrowserHistory()
 
@@ -46,7 +48,9 @@ const App = () => {
             <Auth path="/admin/faculties-list" component={FacultiesList} />
             <Auth path="/admin/edit-faculty" component={EditFaculty} />
             <Auth path="/professor/subjects" component={Subjects} />
+            <Auth path="/professor/subject" component={Subject} />
             <Auth path="/professor/students" component={UsersList} />
+            <Auth path="/professor" component={Professor} />
             <Auth path="/professor/student-details" component={StudentDetails} />
             <Route path="/register" render={ props => <Register {...props} />} />
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
