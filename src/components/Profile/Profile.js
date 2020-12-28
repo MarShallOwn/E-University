@@ -89,7 +89,6 @@ const Profile = () => {
       />
     );
   }
-
   return (
     <Grid container alignItems="center" direction="column">
       <Grid

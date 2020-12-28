@@ -73,8 +73,10 @@ const Subject = (props) => {
           .sort((a, b) => a.lectureNumber - b.lectureNumber)
           .map((lecture, index) => (
             <Lecture
+            key={index}
               handleDeleteLecture={handleDeleteLecture}
               level={level}
+              setSubject = {setSubject}
               subjectId={subject._id}
               lecture={lecture}
             />

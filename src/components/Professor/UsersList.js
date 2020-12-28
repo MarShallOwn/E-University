@@ -61,7 +61,7 @@ const UsersList = props => {
 
   const handleUserDetails = e => {
     Axios.post("/api/studentDetails", {
-      _id: e.target.id
+      _id: e.currentTarget.id
     })
     .then(res => res.data.pass && props.history.push({
       pathname: '/professor/student-details',

@@ -16,24 +16,36 @@ import { MdDelete, MdExpandMore, MdExpandLess } from "react-icons/md";
 import Axios from "axios";
 
 const Lecture = (props) => {
-  const { handleDeleteLecture, level, subjectId, lecture } = props;
+  const { handleDeleteLecture, level, subjectId, lecture, setSubject } = props;
 
-  const [fileType, setFileType] = useState("file");
   const [newMaterial, setNewMaterial] = useState({
-    type: fileType,
+    type: "file",
     name: null,
-    fileName: null,
+    file: null,
     link: null,
   });
 
   const createMaterial = () => {
-    Axios.post("/api/professor/lecture/create-material", {
-      newMaterial,
-      level,
-      subjectId,
-      lecture
-    })
-    .then(res => res.data.pass && console.log(""))
+
+    console.log(newMaterial.file);
+    const formData = new FormData();
+    formData.append("myFile", newMaterial.file);
+    formData.append("newMaterial", JSON.stringify(newMaterial));
+    formData.append("level", JSON.stringify(level));
+    formData.append("subjectId", JSON.stringify(subjectId));
+    formData.append("lecture", JSON.stringify(lecture));
+
+    const headers = {
+      "Content-Type": 'application/x-www-form-urlencoded',
+    };
+
+    Axios.post("/api/professor/lecture/create-material", formData, headers)
+    .then(res => res.data.pass && setSubject(res.data.subject))
+  }
+
+  const handleDeleteMaterial = e => {
+    Axios.post("/api/professor/lecture/delete-material", { materialId: e.currentTarget.value, level, subjectId, lecture })
+    .then(res => res.data.pass && setSubject(res.data.subject))
   }
 
   return (
@@ -46,7 +58,7 @@ const Lecture = (props) => {
         >
           <Grid>
             <p style={{ display: "inline-block", marginRight: "2rem" }}>
-              {lecture.lectureNumber}
+              Lecture: {lecture.lectureNumber}
             </p>
             <MdDelete
               id={lecture.lectureNumber}
@@ -54,17 +66,43 @@ const Lecture = (props) => {
             />
           </Grid>
         </AccordionSummary>
-        <AccordionDetails>
-          <Grid>{lecture.materials.map(() => {})}</Grid>
+        <AccordionDetails style={{display: 'block'}}>
+          <Grid container>
+            {lecture.materials.map((material, index) => 
+            <Grid key={index}>
+              
+              <MdDelete id={material._id} onClick={handleDeleteMaterial} />
+              {
+                material.type === "video" ?
+                <>
+                <p>{material.name}</p>
+                <iframe
+                style={{ borderRadius: "10px", border: "none" }}
+                width="200"
+                height="200"
+                webkitallowfullscreen
+                mozallowfullscreen
+                allowFullScreen
+                src={material.link}
+              ></iframe>
+              </> :
+              <Grid style={{border: '1px solid black'}}>
+                <a href={`https://res.cloudinary.com/dxkufsejm/${material.extension === "pdf" ? 'image' : 'raw'}/upload/fl_attachment/v1601325837/${material.file}`} download>{material.name}.{material.extension}</a>
+                </Grid>
 
-          <Grid>
+              }
+              </Grid>
+            )}
+            </Grid>
+
+          <Grid style={{display: 'block'}}>
             <Grid>
               <FormControl component="fieldset">
                 <FormLabel component="legend">Material Type</FormLabel>
                 <RadioGroup
                   row
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value)}
+                  value={newMaterial.type}
+                  onChange={(e) => setNewMaterial({...newMaterial, type: e.target.value})}
                 >
                   <FormControlLabel
                     value="file"
@@ -85,6 +123,7 @@ const Lecture = (props) => {
                 variant="outlined"
                 label="Name"
                 value={newMaterial.name}
+                size="small"
                 required
                 onChange={(e) => {
                   setNewMaterial({...newMaterial, name: e.target.value});
@@ -93,7 +132,7 @@ const Lecture = (props) => {
             </Grid>
 
             <Grid>
-              {fileType === "video" ? (
+              {newMaterial.type === "video" ? (
                 <TextField
                   label="Video Link"
                   value={newMaterial.link}
@@ -103,7 +142,7 @@ const Lecture = (props) => {
                   }}
                 />
               ) : (
-                <input type="file" required />
+                <input type="file" onChange={e => setNewMaterial({...newMaterial, file: e.target.files[0]})} required />
               )}
             </Grid>
             <Grid>
