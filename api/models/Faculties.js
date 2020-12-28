@@ -10,8 +10,9 @@ const materialSchema = new Schema({
         type: String,
         required: true,
     },
-    fileName: String,
-    link: String
+    file: String,
+    link: String,
+    extension: String
 })
 
 const lectureSchema = new Schema({

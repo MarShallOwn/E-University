@@ -62,7 +62,7 @@ const Navbar = (props) => {
             {activeTab === routes[1] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/Faculty")}>
-            <Link to={routes[2]} style={activeTab === "/Faculty" ? {fontWeight: 'bold'}: {}}>College</Link>
+            <Link to={routes[2]} style={activeTab === "/Faculty" ? {fontWeight: 'bold'}: {}}>Courses</Link>
             {activeTab === routes[2] && <span></span>}
           </li>
           <li onClick={() => setActiveTab("/contact-us")}>

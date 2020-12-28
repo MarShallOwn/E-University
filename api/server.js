@@ -23,8 +23,11 @@ const io = require("socket.io")(server, {
   },
 });
 const bcrypt = require("bcrypt");
+const { json } = require("body-parser");
 const PORT = process.env.PORT || 8080;
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 /**
  * Google OAuth config
  */
@@ -74,6 +77,7 @@ const storage = multer.diskStorage({
   },
 });
 
+/*
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/jpeg" ||
@@ -84,11 +88,11 @@ const fileFilter = (req, file, cb) => {
   }
   cb(null, false);
 };
+*/
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5000000 },
-  fileFilter,
+  limits: { fileSize: 50000000 },
 });
 
 mongoose.connect(process.env.DATABASE, {
@@ -105,8 +109,6 @@ db.once("open", () => {
 
 initalizePassport(passport);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -1024,10 +1026,19 @@ app.post("/api/professor/delete-lecture", checkAuthenticated, (req, res) => {
   });
 });
 
-const videoOrFileUpload = (req, res, frontLevel, subjectId, frontLecture, newMaterial, result = null) => {
-  facultyModel.find({ faculty: req.user.faculty }, (err, faculty) => {
+const videoOrFileUpload = (
+  req,
+  res,
+  frontLevel,
+  subjectId,
+  frontLecture,
+  newMaterial,
+  result = null,
+  ext = null
+) => {
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
     if (err) return res.send({ pass: false });
-    
+
     const docLevel = faculty.levels.find(
       (level, index) => index === frontLevel - 1
     );
@@ -1045,21 +1056,28 @@ const videoOrFileUpload = (req, res, frontLevel, subjectId, frontLecture, newMat
         ? {
             type: newMaterial.type,
             name: newMaterial.name,
-            link: newMaterial.link,
+            link: newMaterial.link.replace(
+              "www.youtube.com/watch",
+              "www.youtube.com/embed"
+            ),
           }
         : {
             type: newMaterial.type,
             name: newMaterial.name,
-            fileName: result.public_id,
+            file: result.public_id,
+            extension: ext,
           }
     );
 
     faculty.save();
 
-    return res.send({ pass: true, subject: docLecture });
+    return res.send({ pass: true, subject: docSubject });
   });
-}
+};
 
+/**
+ * Create material for the selected Lecture
+ */
 app.post(
   "/api/professor/lecture/create-material",
   upload.single("myFile"),
@@ -1071,25 +1089,112 @@ app.post(
       subjectId,
     } = req.body;
 
-    if(req.file && newMaterial.type === "file"){
-    cloudinary.uploader.upload(
-      req.file.path,
-      {
-        folder: "e-university-profile-pictures",
-        use_filename: true,
-      },
-      (err, result) => {
-        if (err) return res.send({ pass: false });
+    if (req.file && JSON.parse(newMaterial).type === "file") {
+      const ext = req.file.originalname.split(".")[
+        req.file.originalname.split(".").length - 1
+      ];
+      cloudinary.uploader.upload(
+        req.file.path,
+        ext === "pdf"
+          ? {
+              folder: "e-university-profile-pictures/materials",
+              use_filename: true,
+            }
+          : {
+              folder: "e-university-profile-pictures/materials",
+              public_id: `${req.file.filename}.${ext}`,
+              resource_type: "raw",
+              raw_convert: "aspose",
+            },
+        (err, result) => {
+          if (err) return console.log(err);
 
-        videoOrFileUpload(req, res, frontLevel, subjectId, frontLecture, newMaterial, result);
-      }
-    );
-  }
-  else{
-    videoOrFileUpload(req, res, frontLevel, subjectId, frontLecture, newMaterial);
-  }
+          videoOrFileUpload(
+            req,
+            res,
+            JSON.parse(frontLevel),
+            JSON.parse(subjectId),
+            JSON.parse(frontLecture),
+            JSON.parse(newMaterial),
+            result,
+            ext
+          );
+        }
+      );
+    } else if (JSON.parse(newMaterial).type === "video") {
+      videoOrFileUpload(
+        req,
+        res,
+        JSON.parse(frontLevel),
+        JSON.parse(subjectId),
+        JSON.parse(frontLecture),
+        JSON.parse(newMaterial)
+      );
+    } else {
+      return res.send({ pass: false });
+    }
   }
 );
+
+/**
+ * Delete material for the selected Lecture
+ */
+app.post("/api/professor/lecture/delete-material", (req, res) => {
+  const {
+    materialId,
+    lecture: frontLecture,
+    level: frontLevel,
+    subjectId,
+  } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level, index) => index === frontLevel - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    const docLecture = docSubject.lectures.find(
+      (lecture) => lecture._id.toString() === frontLecture._id
+    );
+
+    const materialIndex = docLecture.materials.findIndex(
+      (material) => material._id.toString() === materialId
+    );
+
+    const deletedMaterial = docLecture.materials.splice(materialIndex, 1);
+    faculty.save();
+
+    if (deletedMaterial[0].type === "file") {
+      cloudinary.uploader.destroy(
+        deletedMaterial[0].file,
+        deletedMaterial[0].extension !== "pdf" ? { resource_type: "raw" } : {},
+        (err, result) => {
+          if (err) return res.send({ pass: false });
+
+          if (deletedMaterial[0].extension !== "pdf") {
+            cloudinary.uploader.destroy(
+              deletedMaterial[0].file,
+              (err, result) => {
+                if (err) return res.send({ pass: false });
+
+                return res.send({ pass: true, subject: docSubject });
+              }
+            );
+          } else {
+            return res.send({ pass: true, subject: docSubject });
+          }
+        }
+      );
+    } else {
+      return res.send({ pass: false });
+    }
+  });
+});
 
 app.get("/api/profStudents", checkAuthenticated, (req, res) => {
   const faculty = {};

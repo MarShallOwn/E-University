@@ -50,7 +50,7 @@ const App = () => {
             <Auth path="/professor/subjects" component={Subjects} />
             <Auth path="/professor/subject" component={Subject} />
             <Auth path="/professor/students" component={UsersList} />
-            <Auth path="/professor" component={Professor} />
+            <Auth exact path="/professor" component={Professor} />
             <Auth path="/professor/student-details" component={StudentDetails} />
             <Route path="/register" render={ props => <Register {...props} />} />
             <Route path="/continue-register" render={ props => <ContinueRegister {...props} />} />
