@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
 import Axios from "axios";
 
@@ -10,6 +10,32 @@ import AboutLeadership2 from "../assets/images/About-Leadership-2.jpeg";
 import Footer from "./Footer";
 
 const About = (props) => {
+
+  const [state, setstate] = useState({
+    year: 0,
+    students: 0,
+    faculties: 0
+  })
+
+  useEffect(() => {
+    for(let i=0, j=0, z= 0; i <= 164521; i = i + 250  , j = j + 3, z++){
+      setTimeout(() => {
+        
+        if(z > 8){
+          setstate({faculties: 8, year: j, students: i})
+        }
+        else if(j > 1965){
+          setstate({faculties: 8, year: 1965, students: i});
+        }
+        else{
+          setstate({faculties: z, year: j, students: i});
+        }
+      })
+    }
+  }, [])
+
+  console.log(state);
+
   return (
     <Grid>
       <Grid
@@ -69,7 +95,7 @@ const About = (props) => {
               font: "normal normal 600 20px/5px Poppins",
             }}
           >
-            1965
+            {state.year}
           </p>
         </Grid>
         <Grid style={{ textAlign: "center" }}>
@@ -105,7 +131,7 @@ const About = (props) => {
               font: "normal normal 600 20px/5px Poppins",
             }}
           >
-            16,452
+            {state.students.toLocaleString()}
           </p>
         </Grid>
         <Grid style={{ textAlign: "center" }}>
@@ -123,7 +149,7 @@ const About = (props) => {
               font: "normal normal 600 20px/5px Poppins",
             }}
           >
-            8
+            {state.faculties}
           </p>
         </Grid>
       </Grid>
@@ -404,7 +430,7 @@ const About = (props) => {
           </Grid>
         </Grid>
         <Grid style={{width: '100%'}}>
-        <p style={{color: '#424446', font: 'normal normal normal 20px/40px Poppins', width: '1100px'}}>
+        <p style={{color: '#424446', font: 'normal normal normal 20px/40px Poppins', maxWidth: '1100px'}}>
           “Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
           hendrerit nisi sed sollicitudin pellentesque. Nunc posuere purus
           rhoncus pulvinar aliquam. Ut aliquet tristique nisl vitae volutpat.
