@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Collapse, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Pharmacy from "../assets/images/Pharmacy.jpeg";
 import Engineering from "../assets/images/Engineering.jpeg";
 import ComputerScience from "../assets/images/Computer-Science.jpeg";
@@ -8,11 +8,9 @@ import BusinessAdministration from "../assets/images/Business-Administration.jpe
 import Media from "../assets/images/Media.jpeg";
 import Footer from './Footer';
 
-import { useStyles } from "./styleColleges";
 import CollegeCard from "./CollegeCard";
 
 const Colleges = () => {
-  const classes = useStyles();
 
   const [collapseHover, setCollapseHover] = useState({
     first: false,
