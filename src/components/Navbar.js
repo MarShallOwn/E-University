@@ -5,6 +5,7 @@ import { MdEmail, MdNotifications } from "react-icons/md";
 import { useLoggedIn, useUser } from "../contexts/UserProvider";
 import { useStyles } from "./styleNavbar";
 import Axios from "axios";
+import Logo from '../assets/images/E-University-Logo.svg';
 
 const routes = ["/","/about", "/Faculty", "/contact-us", "/chat", "/admin/create-user", "/register", "/login"]
 
@@ -50,7 +51,7 @@ const Navbar = (props) => {
           alignItems="center"
           className={classes.universityName}
         >
-          B.S University
+          <img style={{width: '23.5px', height: '23.5px', marginRight: '10px'}} src={Logo} />B.S University
         </Grid>
         <Grid container item xs={10} justify="flex-end" alignItems="center">
           <li onClick={() => setActiveTab("/")}>

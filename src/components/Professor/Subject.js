@@ -45,7 +45,7 @@ const Subject = (props) => {
   return (
     <Grid>
       <Grid>
-        <p style={{ display: "inline-block" }}>Lecture: </p>
+        <p style={{ display: "inline-block" }}>Add Lecture: </p>
         <TextField
           variant="outlined"
           type="number"

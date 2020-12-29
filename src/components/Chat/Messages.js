@@ -22,13 +22,15 @@ const Messages = (props) => {
       backgroundColor: '#1C60B3',
       borderRadius: '32px',
       padding: '8px 20px',
-      margin: '5px 20px 5px 0px'
+      margin: '5px 20px 5px 0px',
+      color: 'white'
     },
     leftMessage: {
       float: "left",
       display: "block",
       clear: "both",
-      backgroundColor: '#9696A0',
+      backgroundColor: 'rgba(150,150,160, 0.2)',
+      color: '#252526',
       borderRadius: '32px',
       padding: '8px 20px',
       margin: '5px 20px 5px 20px'
