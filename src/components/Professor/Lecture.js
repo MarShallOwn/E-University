@@ -13,6 +13,8 @@ import {
   AccordionDetails,
 } from "@material-ui/core";
 import { MdDelete, MdExpandMore, MdExpandLess } from "react-icons/md";
+import {SiMicrosoftpowerpoint, SiMicrosoftword} from "react-icons/si";
+import { AiFillFilePdf } from "react-icons/ai";
 import Axios from "axios";
 
 const Lecture = (props) => {
@@ -87,7 +89,7 @@ const Lecture = (props) => {
               ></iframe>
               </> :
               <Grid style={{border: '1px solid black'}}>
-                <a href={`https://res.cloudinary.com/dxkufsejm/${material.extension === "pdf" ? 'image' : 'raw'}/upload/fl_attachment/v1601325837/${material.file}`} download>{material.name}.{material.extension}</a>
+                <a href={`https://res.cloudinary.com/dxkufsejm/${material.extension === "pdf" ? 'image' : 'raw'}/upload/fl_attachment/v1601325837/${material.file}`} download>{icons[material.extension]} {material.name}.{material.extension}</a>
                 </Grid>
 
               }
@@ -158,3 +160,11 @@ const Lecture = (props) => {
 };
 
 export default Lecture;
+
+
+const icons = {
+  pdf: <AiFillFilePdf />,
+  pptx: <SiMicrosoftpowerpoint />,
+  docx: <SiMicrosoftword />,
+  doc: <SiMicrosoftword />
+}

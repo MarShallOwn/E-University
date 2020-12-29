@@ -44,7 +44,7 @@ const ChatRoom = (props) => {
 
   return (
     <Grid style={{ position: "relative", height: "100%" }}>
-      <Grid container justify="center" alignItems="center" style={{ height: "90px", borderBottom: "1px solid black" }}>
+      <Grid container justify="center" alignItems="center" style={{ height: "90px", borderBottom: "1px solid #9696A0" }}>
         <Grid style={styles.tab}>
         <img
           style={{
@@ -73,14 +73,14 @@ const ChatRoom = (props) => {
           bottom: "0",
           width: "100%",
           height: "90px",
-          borderTop: "1px solid black",
+          borderTop: "1px solid #9696A0",
           display: "inline-block",
         }}
       >
         <div
           style={{
             height: "100%",
-            width: "calc(100% - 100px)",
+            width: "calc(100% - 0px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -108,6 +108,8 @@ const ChatRoom = (props) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            position: 'absolute',
+            right: 0
           }}
         >
           <div

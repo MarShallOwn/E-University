@@ -201,7 +201,7 @@ const Home = () => {
             backgroundSize: "cover",
           }}
         >
-          <div style={{height: '100%', width: '100%', backgroundColor: '#2C4563', opacity: '0.31'}}></div>
+          <div style={{height: '100%', width: '100%', backgroundColor: '#2C4563', opacity: '0.4'}}></div>
           <p
             style={{
               maxHeight: "994px",
@@ -214,6 +214,7 @@ const Home = () => {
               color: "white",
               fontSize: "20px",
               font: "normal normal normal 20px/33px Segoe UI",
+              zIndex: 10
             }}
           >
             “Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam

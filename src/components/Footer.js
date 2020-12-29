@@ -2,6 +2,7 @@ import React from 'react'
 import { Grid } from '@material-ui/core'
 import { FaFacebookF, FaTwitter } from 'react-icons/fa'
 import { useStyles } from './FooterStyle'
+import Logo from '../assets/images/E-University-Logo.svg'
 
 const Footer = () => {
 
@@ -27,7 +28,7 @@ const Footer = () => {
             color: "white",
           }}
         >
-          B.S University
+          <img style={{width: '28.5px', height: '28.5px', marginRight: '10px', position: 'relative', top: '5px'}} src={Logo} />B.S University
         </p>
 
         <ul style={{ color: "red", position: "absolute", right: "274px" }}>

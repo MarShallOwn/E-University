@@ -15,5 +15,11 @@ export const useStyles = makeStyles( theme => ({
           "& td": {
               textAlign: 'center',
           }
+    },
+    studentRow: {
+      cursor: 'pointer',
+      "&:hover": {
+        backgroundColor: 'rgba(28, 96, 179, 0.2)',
+      }
     }
 }))

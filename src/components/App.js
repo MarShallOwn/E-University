@@ -28,6 +28,7 @@ import Subject from "./Professor/Subject";
 import UsersList from "./Professor/UsersList";
 import StudentDetails from "./Professor/StudentDetails";
 import Professor from "./Professor/Professor";
+import Colleges from './Colleges';
 
 //const history = createBrowserHistory()
 
@@ -43,6 +44,7 @@ const App = () => {
             <Route exact path="/" render={ props => <Home {...props} />} />
             <Route path="/about" render={ props => <About {...props} />} />
             <Route path="/contact-us" render={ props => <ContactUs {...props} />} />
+            <Route path="/colleges" render={ props => <Colleges {...props} />} />
             <Route path="/admin/create-user" render={ props => <CreateUser {...props} />} />
             <Auth path="/admin/create-faculty"component={CreateFaculty} />
             <Auth path="/admin/faculties-list" component={FacultiesList} />

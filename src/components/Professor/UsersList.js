@@ -8,7 +8,6 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import Axios from "axios";
-import { MdModeEdit } from "react-icons/md";
 import { useStyles } from "./style";
 
 const UsersList = props => {
@@ -251,7 +250,7 @@ const UsersList = props => {
               <th></th>
             </tr>
             {users.map((user, index) => (
-              <tr key={index} id={user._id} onClick={handleUserDetails}>
+              <tr key={index} id={user._id} onClick={handleUserDetails} className={classes.studentRow}>
                 <td>
                   <img
                     style={{
@@ -269,7 +268,6 @@ const UsersList = props => {
                 <td>{user.department}</td>
                 <td>{user.city}</td>
                 <td>
-                  <MdModeEdit id={user._id} />
                 </td>
               </tr>
             ))}

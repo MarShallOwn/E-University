@@ -26,16 +26,16 @@ const StudentDetails = (props) => {
             src={`https://res.cloudinary.com/dxkufsejm/image/upload/v1601325837/${student.picture}`}
           />
         </Grid>
-        <Grid>
-          <p>First Name: {student.firstname}</p>
-          <p>Last Name: {student.lastname}</p>
-          <p>Email: {student.email}</p>
-          <p>Phone Number: {student.phoneNumber}</p>
-          <p>Faculty: {student.faculty}</p>
-          <p>Level: {student.level}</p>
-          <p>Department: {student.department}</p>
-          <p>Street: {student.street}</p>
-          <p>City: {student.city}</p>
+        <Grid style={{textAlign: 'center'}}>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>First Name: <span style={{fontWeight: '500'}}>{student.firstname}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Last Name: <span style={{fontWeight: '500'}}>{student.lastname}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Email: <span style={{fontWeight: '500'}}>{student.email}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Phone Number: <span style={{fontWeight: '500'}}>{student.phoneNumber}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Faculty: <span style={{fontWeight: '500'}}>{student.faculty}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Level: <span style={{fontWeight: '500'}}>{student.level}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Department: <span style={{fontWeight: '500'}}>{student.department}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>Street: <span style={{fontWeight: '500'}}>{student.street}</span></p>
+          <p style={{font: 'normal normal bold 16px/20px Poppins'}}>City: <span style={{fontWeight: '500'}}>{student.city}</span></p>
         </Grid>
       </Grid>
 

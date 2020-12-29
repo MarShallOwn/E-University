@@ -81,12 +81,12 @@ const Chat = (props) => {
           item
           style={{
             float: "left",
-            minWidth: "calc(100% - 825.5px)",
+            width: "calc(100% - 825.5px)",
             height: "100%",
           }}
         >
           <ListContainer>
-            <div style={{ height: "89px", borderBottom: "1px solid black" }}>
+            <div style={{ height: "89px", borderBottom: "1px solid #9696A0" }}>
               <div
                 style={{
                   font: "normal normal 600 18px/27px Poppins",
@@ -97,7 +97,7 @@ const Chat = (props) => {
               >
                 <p style={{ margin: "0", display: "inline-block", marginLeft: '13px',
                   marginTop: '15px' }}>
-                  {showProfessors ? "Contacts" : "Professors"}
+                  {showProfessors ? "Professors" : "Contacts"}
                 </p>
                 <MdExpandMore />
               </div>
