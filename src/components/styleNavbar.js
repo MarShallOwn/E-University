@@ -15,12 +15,10 @@ export const useStyles = makeStyles( theme => ({
             height: '100%',
         },
         '& li': {
-            position: 'relative',
             display: 'flex',
             alignItems: 'center',
             height: '100%',
             cursor: 'pointer',
-            margin: '0 1.7rem',
         },
         '& span': {
             position: 'absolute',

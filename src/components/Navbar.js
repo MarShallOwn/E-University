@@ -75,90 +75,164 @@ const Navbar = (props) => {
           B.S University
         </Grid>
         <Grid container item xs={10} justify="flex-end" alignItems="center">
-          <li onClick={() => setActiveTab("/")}>
-            <Link
-              to={routes[0]}
-              style={activeTab === "/" ? { fontWeight: "bold" } : {}}
-            >
+          <Link
+            onClick={() => setActiveTab("/")}
+            to={routes[0]}
+            style={
+              activeTab === "/"
+                ? {
+                    fontWeight: "bold",
+                    position: "relative",
+                    margin: "0 1.7rem",
+                    height: "100%",
+                  }
+                : { margin: "0 1.7rem", height: "100%" }
+            }
+          >
+            <li>
               Home
-            </Link>
-            {activeTab === routes[0] && <span></span>}
-          </li>
-          <li onClick={() => setActiveTab("/about")}>
-            <Link
-              to={routes[1]}
-              style={activeTab === "/about" ? { fontWeight: "bold" } : {}}
-            >
-              About
-            </Link>
-            {activeTab === routes[1] && <span></span>}
-          </li>
-          <li onClick={() => setActiveTab("/contact-us")}>
-            <Link
-              to={routes[2]}
-              style={activeTab === "/contact-us" ? { fontWeight: "bold" } : {}}
-            >
-              Contact Us
-            </Link>
-            {activeTab === routes[2] && <span></span>}
-          </li>
-          <li onClick={() => setActiveTab("/colleges")}>
-            <Link
-              to={routes[3]}
-              style={activeTab === "/colleges" ? { fontWeight: "bold" } : {}}
-            >
-              Colleges
-            </Link>
-            {activeTab === routes[3] && <span></span>}
-          </li>
-          {user.email && (
-            <li onClick={() => setActiveTab("/faculty")}>
-              <Link
-                to={routes[4]}
-                style={activeTab === "/faculty" ? { fontWeight: "bold" } : {}}
-              >
-                Courses
-              </Link>
-              {activeTab === routes[4] && <span></span>}
+              {activeTab === routes[0] && <span></span>}
             </li>
+          </Link>
+          <Link
+            onClick={() => setActiveTab("/about")}
+            to={routes[1]}
+            style={
+              activeTab === "/about"
+                ? {
+                    fontWeight: "bold",
+                    position: "relative",
+                    margin: "0 1.7rem",
+                    height: "100%",
+                  }
+                : { margin: "0 1.7rem", height: "100%" }
+            }
+          >
+            <li>
+              About
+              {activeTab === routes[1] && <span></span>}
+            </li>
+          </Link>
+          <Link
+            onClick={() => setActiveTab("/contact-us")}
+            to={routes[2]}
+            style={
+              activeTab === "/contact-us"
+                ? {
+                    fontWeight: "bold",
+                    position: "relative",
+                    margin: "0 1.7rem",
+                    height: "100%",
+                  }
+                : { margin: "0 1.7rem", height: "100%" }
+            }
+          >
+            <li>
+              Contact Us
+              {activeTab === routes[2] && <span></span>}
+            </li>
+          </Link>
+          <Link
+            onClick={() => setActiveTab("/colleges")}
+            to={routes[3]}
+            style={
+              activeTab === "/colleges"
+                ? {
+                    fontWeight: "bold",
+                    position: "relative",
+                    margin: "0 1.7rem",
+                    height: "100%",
+                  }
+                : { margin: "0 1.7rem", height: "100%" }
+            }
+          >
+            <li>
+              Colleges
+              {activeTab === routes[3] && <span></span>}
+            </li>
+          </Link>
+          {user.email && (
+            <Link
+              onClick={() => setActiveTab("/faculty")}
+              to={routes[4]}
+              style={
+                activeTab === "/faculty"
+                  ? {
+                      fontWeight: "bold",
+                      position: "relative",
+                      margin: "0 1.7rem",
+                      height: "100%",
+                    }
+                  : { margin: "0 1.7rem", height: "100%" }
+              }
+            >
+              <li>
+                Courses
+                {activeTab === routes[4] && <span></span>}
+              </li>
+            </Link>
           )}
           {user.isAdmin && (
-            <li onClick={() => setActiveTab("/admin/create-user")}>
-              <Link
-                to={routes[6]}
-                style={
-                  activeTab === "/admin/create-user"
-                    ? { fontWeight: "bold" }
-                    : {}
-                }
-              >
+            <Link
+              onClick={() => setActiveTab("/admin/create-user")}
+              to={routes[6]}
+              style={
+                activeTab === "/admin/create-user"
+                  ? {
+                      fontWeight: "bold",
+                      position: "relative",
+                      margin: "0 1.7rem",
+                      height: "100%",
+                    }
+                  : { margin: "0 1.7rem", height: "100%" }
+              }
+            >
+              <li>
                 Create User
-              </Link>
-              {activeTab === routes[6] && <span></span>}
-            </li>
+                {activeTab === routes[6] && <span></span>}
+              </li>
+            </Link>
           )}
           {!user.email && (
             <>
-              <li onClick={() => setActiveTab("/register")}>
-                <Link
-                  to={routes[7]}
-                  style={
-                    activeTab === "/register" ? { fontWeight: "bold" } : {}
-                  }
-                >
+              <Link
+                onClick={() => setActiveTab("/register")}
+                to={routes[7]}
+                style={
+                  activeTab === "/register"
+                    ? {
+                        fontWeight: "bold",
+                        position: "relative",
+                        margin: "0 1.7rem",
+                        height: "100%",
+                      }
+                    : { margin: "0 1.7rem", height: "100%" }
+                }
+              >
+                <li>
                   Register
-                </Link>
-                {activeTab === routes[7] && <span></span>}
-              </li>
-              <li onClick={() => setActiveTab("/login")}>
-                <Link
-                  to={routes[8]}
-                  style={activeTab === "/login" ? { fontWeight: "bold" } : {}}
-                >
+                  {activeTab === routes[7] && <span></span>}
+                </li>
+              </Link>
+              <Link
+                onClick={() => setActiveTab("/login")}
+                to={routes[8]}
+                style={
+                  activeTab === "/login"
+                    ? {
+                        fontWeight: "bold",
+                        position: "relative",
+                        margin: "0 1.7rem",
+                        height: "100%",
+                      }
+                    : { margin: "0 1.7rem", height: "100%" }
+                }
+              >
+                <li>
                   Login
-                </Link>
-                {activeTab === routes[8] && <span></span>}
-              </li>
+                  {activeTab === routes[8] && <span></span>}
+                </li>
+              </Link>
             </>
           )}
           {user.email && (
@@ -224,18 +298,21 @@ const Navbar = (props) => {
             </Grid>
             <Divider />
             <Grid container justify="flex-start">
-              <Button
-                onClick={handleClose}
-                fullWidth
-                style={{ justifyContent: "flex-start", textTransform: "none" }}
+              <Link
+                to="/profile"
+                style={{ textDecoration: "none", color: "black", width: "100%" }}
               >
-                <Link
-                  to="/profile"
-                  style={{ textDecoration: "none", color: "black" }}
+                <Button
+                  onClick={handleClose}
+                  fullWidth
+                  style={{
+                    justifyContent: "flex-start",
+                    textTransform: "none",
+                  }}
                 >
                   Profile
-                </Link>
-              </Button>
+                </Button>
+              </Link>
               <Divider />
               <Button
                 onClick={logout}
