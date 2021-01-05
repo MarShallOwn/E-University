@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Grid } from "@material-ui/core";
+import Medicine from "../assets/images/Medicine.jpg";
 import Pharmacy from "../assets/images/Pharmacy.jpeg";
 import Engineering from "../assets/images/Engineering.jpeg";
 import ComputerScience from "../assets/images/Computer-Science.jpeg";
+import ArtificialIntelligence from "../assets/images/Artificial-Intelligence.jpg";
 import Literature from "../assets/images/Literature.jpeg";
 import BusinessAdministration from "../assets/images/Business-Administration.jpeg";
 import Media from "../assets/images/Media.jpeg";
@@ -69,7 +71,7 @@ const Colleges = () => {
           cardOrder="first"
           collapseHover={collapseHover}
           direction="left"
-          image={"good"}
+          image={Medicine}
           facultyName="Faculty of medicine"
           handleMouseEnter={handleMouseEnter}
           handleMouseLeave={handleMouseLeave}
@@ -121,7 +123,7 @@ const Colleges = () => {
           cardOrder="fifth"
           collapseHover={collapseHover}
           direction="left"
-          image={"good"}
+          image={ArtificialIntelligence}
           facultyName="Faculty of artificial intelligence"
           handleMouseEnter={handleMouseEnter}
           handleMouseLeave={handleMouseLeave}

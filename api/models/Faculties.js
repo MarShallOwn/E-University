@@ -12,7 +12,11 @@ const materialSchema = new Schema({
     },
     file: String,
     link: String,
-    extension: String
+    extension: String,
+    createdAt: {
+        type: Date,
+        required: true
+    }
 })
 
 const lectureSchema = new Schema({
@@ -20,6 +24,10 @@ const lectureSchema = new Schema({
         type: Number,
         required: true,
         unique: true,
+    },
+    createdAt: {
+        type: Date,
+        required: true
     },
     materials: [materialSchema]
 })

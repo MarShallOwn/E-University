@@ -5,7 +5,7 @@ import { Grid, TextField, Button } from "@material-ui/core";
 import { useUser, useLoggedIn } from "../../contexts/UserProvider";
 import { useForm } from "react-hook-form";
 import Axios from "axios";
-import loginImage from '../../assets/images/Login.jpeg'
+import loginImage from "../../assets/images/Login.jpeg";
 
 const Login = (props) => {
   const user = useUser();
@@ -50,10 +50,18 @@ const Login = (props) => {
   return (
     <Grid container style={{ height: "calc(100vh - 3.5rem)" }}>
       <Grid item xs={6}>
-        <img
-          style={{ width: "100%", height: "100%" }}
-          src={loginImage}
-        />
+        <Grid
+          style={{
+            width: "100%",
+            height: "calc(100vh - 3.5rem)",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            style={{ height: "100%", marginLeft: "-150px" }}
+            src={loginImage}
+          />
+        </Grid>
       </Grid>
       <Grid item xs={6} container alignItems="center" justify="center">
         <Grid container direction="column" style={{ width: "448.5px" }}>
@@ -103,11 +111,10 @@ const Login = (props) => {
               required: true,
               pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
             })}
-
             style={{
-                marginBottom: '42.5px',
-                marginTop: '20px',
-                font: 'normal normal medium 16px/35px Poppins'
+              marginBottom: "42.5px",
+              marginTop: "20px",
+              font: "normal normal medium 16px/35px Poppins",
             }}
             required
           />
@@ -129,20 +136,53 @@ const Login = (props) => {
             })}
             required
           />
-          <div style={{widht: '100%'}}>
-          <Link to="/auth/forgot-password" style={{float: 'right', marginTop: '9.5px', marginRight: '15px', textDecoration: 'none', color: '#1C60B3', font: "normal normal normal 14px/16px Arial"}}>Forgot Password ?</Link>
+          <div style={{ widht: "100%" }}>
+            <Link
+              to="/auth/forgot-password"
+              style={{
+                float: "right",
+                marginTop: "9.5px",
+                marginRight: "15px",
+                textDecoration: "none",
+                color: "#1C60B3",
+                font: "normal normal normal 14px/16px Arial",
+              }}
+            >
+              Forgot Password ?
+            </Link>
           </div>
           {_.get("password.type", errors) === "required" && (
             <p>This field is required</p>
           )}
           <Button
-            style={{ height: '55px', borderRadius: '10px', marginTop: "2rem", backgroundColor: '#1C60B3', color: 'white', font: 'normal normal medium 16px/35px Poppins', fontSize: '16px' }}
+            style={{
+              height: "55px",
+              borderRadius: "10px",
+              marginTop: "2rem",
+              backgroundColor: "#1C60B3",
+              color: "white",
+              font: "normal normal medium 16px/35px Poppins",
+              fontSize: "16px",
+            }}
             variant="contained"
             onClick={handleSubmit(loginUser)}
           >
             Login
           </Button>
-          <p style={{textAlign: 'center', marginTop: '18px', color: '#9696A0', font: 'normal normal normal 14px/21px Poppins', fontSize: '14px'}}>Don't have an account ? <Link to="/register" style={{color: '#242523'}}>Sign up</Link></p>
+          <p
+            style={{
+              textAlign: "center",
+              marginTop: "18px",
+              color: "#9696A0",
+              font: "normal normal normal 14px/21px Poppins",
+              fontSize: "14px",
+            }}
+          >
+            Don't have an account ?{" "}
+            <Link to="/register" style={{ color: "#242523" }}>
+              Sign up
+            </Link>
+          </p>
         </Grid>
       </Grid>
     </Grid>

@@ -21,6 +21,7 @@ import CheckMail from "./Auth/CheckMail";
 import ResetPassword from "./Auth/ResetPassword";
 import CreateFaculty from "./Admin/Faculty/CreateFaculty";
 import Faculty from "./Faculty/Faculty";
+import StudentSubject from "./Faculty/Subject";
 import FacultiesList from "./Admin/Faculty/FacultiesList"
 import EditFaculty from "./Admin/Faculty/EditFaculty";
 import Subjects from "./Professor/Subjects";
@@ -63,7 +64,8 @@ const App = () => {
             <UnAuth path="/auth/reset/:resetToken" component={ResetPassword} />
             <Auth path="/chat" component={Chat} />
             <Auth path="/profile" component={Profile} />
-            <Auth path="/Faculty" component={Faculty} />
+            <Auth exact path="/faculty" component={Faculty} />
+            <Auth path="/faculty/subject" component={StudentSubject} />
           </Switch>
         </UserProvider>
     </Router>
