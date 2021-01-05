@@ -470,11 +470,10 @@ app.post(
  * Update user's Profile details
  */
 app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
-  const { street, city, phoneNumber } = req.body.data;
 
   userModel.findOneAndUpdate(
     { email: req.user.email },
-    { street, city, phoneNumber },
+    { ...req.body.data },
     (err, user) => {
       if (user) {
         return res.send({ pass: true });
@@ -847,17 +846,52 @@ app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
     const { name, currentTerm, creditHours } = doc;
 
     const level = doc.levels[req.user.level - 1];
+
+    let latestFiles = [];
+    let latestVideos = [];
+
+    for(let subject of doc.levels[req.user.level - 1].subjects){
+      for(let lecture of subject.lectures){
+        for(let material of lecture.materials){
+          if(material.type === "file"){
+            latestFiles.push({...material._doc, professor: subject.professor, subjectName: subject.name, lectureNumber: lecture.lectureNumber})
+          }
+          else if(material.type === "video"){
+            latestVideos.push({...material._doc, professor: subject.professor, subjectName: subject.name, lectureNumber: lecture.lectureNumber})
+          }
+        }
+      }
+    }
+
+    latestFiles.sort((a, b) => a.createdAt - b.createdAt).splice(2);
+    latestVideos.sort((a, b) => a.createdAt - b.createdAt).splice(2);
+
     const faculty = {
       name,
       currentTerm,
       creditHours,
       level,
       department: req.user.department,
+      latestFiles,
+      latestVideos
     };
 
     return res.send({ pass: true, faculty });
   });
 });
+
+app.get("/api/getStudentSubject/:subjectId", checkAuthenticated,  (req, res) => {
+  const { subjectId } = req.params
+
+  facultyModel.findOne({name: req.user.faculty}, (err, faculty) => {
+    if(err) return res.send({pass: false})
+
+    const level = faculty.levels.find((level, index) => index === (req.user.level - 1));
+    const subject = level.subjects.find(subject => subject._id.toString() === subjectId)
+
+    return res.send({pass: true, subject})
+  })
+})
 
 /**
  *  Get all Faculties in an array to be shown in a list
@@ -989,6 +1023,7 @@ app.post("/api/professor/create-lecture", checkAuthenticated, (req, res) => {
 
     docSubject.lectures.push({
       lectureNumber: newLecture,
+      createdAt: new Date(),
       materials: [],
     });
 
@@ -1026,6 +1061,15 @@ app.post("/api/professor/delete-lecture", checkAuthenticated, (req, res) => {
   });
 });
 
+const getYoutubeVideoId = url => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  return (match && match[2].length === 11)
+    ? match[2]
+    : null;
+}
+
 const videoOrFileUpload = (
   req,
   res,
@@ -1056,16 +1100,15 @@ const videoOrFileUpload = (
         ? {
             type: newMaterial.type,
             name: newMaterial.name,
-            link: newMaterial.link.replace(
-              "www.youtube.com/watch",
-              "www.youtube.com/embed"
-            ),
+            link: getYoutubeVideoId(newMaterial.link),
+            createdAt: new Date()
           }
         : {
             type: newMaterial.type,
             name: newMaterial.name,
             file: result.public_id,
             extension: ext,
+            createdAt: new Date()
           }
     );
 
@@ -1190,8 +1233,11 @@ app.post("/api/professor/lecture/delete-material", (req, res) => {
           }
         }
       );
-    } else {
-      return res.send({ pass: false });
+    } else if (deletedMaterial[0].type === "video") {
+      return res.send({ pass: true, subject: docSubject });
+    }
+    else{
+      return res.send({pass: false});
     }
   });
 });
@@ -1204,7 +1250,6 @@ app.get("/api/profStudents", checkAuthenticated, (req, res) => {
     "firstname lastname email level department picture city",
     (err, users) => {
       if (err) return res.send({ pass: false });
-
       facultyModel.findOne(
         { name: req.user.faculty },
         "levels departments",

@@ -46,7 +46,7 @@ const Lecture = (props) => {
   }
 
   const handleDeleteMaterial = e => {
-    Axios.post("/api/professor/lecture/delete-material", { materialId: e.currentTarget.value, level, subjectId, lecture })
+    Axios.post("/api/professor/lecture/delete-material", { materialId: e.currentTarget.id, level, subjectId, lecture })
     .then(res => res.data.pass && setSubject(res.data.subject))
   }
 
@@ -85,7 +85,7 @@ const Lecture = (props) => {
                 webkitallowfullscreen
                 mozallowfullscreen
                 allowFullScreen
-                src={material.link}
+                src={`https://www.youtube.com/embed/${material.link}`}
               ></iframe>
               </> :
               <Grid style={{border: '1px solid black'}}>

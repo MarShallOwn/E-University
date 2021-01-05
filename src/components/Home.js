@@ -4,14 +4,14 @@ import { Grid } from "@material-ui/core";
 import { useUser } from "../contexts/UserProvider";
 import Footer from "./Footer";
 import "./styleHome.css";
-import smilingStudent from '../assets/images/young-attractive-smiling-student-showing-thumb-up-outdoors-campus-university.jpg'
-import hipstermale from '../assets/images/portrait-delighted-hipster-male-student-with-crisp-hair.jpg'
-import recommendation from '../assets/images/Recommendation.jpeg'
+import smilingStudent from "../assets/images/young-attractive-smiling-student-showing-thumb-up-outdoors-campus-university.jpg";
+import hipstermale from "../assets/images/portrait-delighted-hipster-male-student-with-crisp-hair.jpg";
+import recommendation from "../assets/images/Recommendation.jpeg";
 
 const Home = () => {
   const user = useUser();
 
-  console.log(user)
+  console.log(user);
 
   return (
     <Grid>
@@ -44,6 +44,7 @@ const Home = () => {
           <p
             style={{
               fontSize: "40px",
+              marginTop: '70px',
               font: "normal normal 600 40px/60px Poppins",
             }}
           >
@@ -131,7 +132,7 @@ const Home = () => {
               sunt in culpa qui officia deserunt mollit anim id est laborum.
             </p>
           </Grid>
-          <img
+          <Grid
             style={{
               width: "449px",
               height: "400px",
@@ -139,9 +140,11 @@ const Home = () => {
               position: "absolute",
               top: "163px",
               right: "95px",
+              overflow: 'hidden'
             }}
-            src={hipstermale}
-          />
+          >
+            <img style={{height: '400px', marginLeft: '-80px'}} src={hipstermale} />
+          </Grid>
           <div
             style={{
               width: "407px",
@@ -157,9 +160,8 @@ const Home = () => {
       </Grid>
 
       {/* Recommendations */}
-      <Grid style={{ height: "600px"}}>
-        <Grid
-        >
+      <Grid style={{ height: "600px" }}>
+        <Grid>
           <Grid
             style={{
               position: "relative",
@@ -196,17 +198,24 @@ const Home = () => {
             position: "relative",
             width: "100%",
             height: "510px",
-            background:
-              `url(${recommendation}) 0% 0% no-repeat padding-box`,
-            backgroundSize: "cover",
           }}
         >
-          <div style={{height: '100%', width: '100%', backgroundColor: '#2C4563', opacity: '0.4'}}></div>
+          <Grid style={{height: '510px', width: '100%', position: 'absolute', top: '0', overflow: 'hidden'}}>
+            <img src={recommendation} style={{height: '1000px', width: '100%', marginTop: '-50px'}} />
+          </Grid>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              backgroundColor: "#2C4563",
+              opacity: "0.4",
+            }}
+          ></div>
           <p
             style={{
               maxHeight: "994px",
               height: "188px",
-              width: '994px',
+              width: "994px",
               position: "absolute",
               top: "156px",
               left: "186px",
@@ -214,7 +223,7 @@ const Home = () => {
               color: "white",
               fontSize: "20px",
               font: "normal normal normal 20px/33px Segoe UI",
-              zIndex: 10
+              zIndex: 10,
             }}
           >
             “Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
@@ -237,7 +246,7 @@ const Home = () => {
                 color: "#424446",
               }}
             >
-              Marwan Pablo <br />
+              Rihanh Marwan <br />
               <span style={{ font: "normal normal normal 18px/27px Segoe UI" }}>
                 class of 2019
               </span>
@@ -367,10 +376,64 @@ const Home = () => {
 export default Home;
 
 /*
-      {!_.isEmpty(user.email) && (
-        <p>
-          Welcome {user.isProf && "Dr. "} {user.firstname} {user.lastname}
-        </p>
-      )}
-      Home Page
+<Grid
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "510px",
+            background: `url(${recommendation}) 0% 0% no-repeat padding-box`,
+            backgroundSize: "cover",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              backgroundColor: "#2C4563",
+              opacity: "0.4",
+            }}
+          ></div>
+          <p
+            style={{
+              maxHeight: "994px",
+              height: "188px",
+              width: "994px",
+              position: "absolute",
+              top: "156px",
+              left: "186px",
+              margin: "0 auto",
+              color: "white",
+              fontSize: "20px",
+              font: "normal normal normal 20px/33px Segoe UI",
+              zIndex: 10,
+            }}
+          >
+            “Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam
+            hendrerit nisi sed sollicitudin pellentesque. Nunc posuere purus
+            rhoncus pulvinar aliquam. Ut aliquet tristique nisl vitae volutpat.
+            Nulla aliquet porttitor venenatis. Donec a dui et dui fringilla
+            consectetur id nec massa. Aliquam erat volutpat. Sed ut dui ut lacus
+            dictum fermentum vel tincidunt neque. Sed sed lacinia lectus. Duis
+            sit amet sodales felis. Duis nunc eros, mattis at dui ac, convallis
+            semper risus. In adipiscing ultrices tellus, in suscipit massa
+            vehicula eu.”
+          </p>
+          <Grid
+            style={{ position: "absolute", bottom: "52px", right: "307px" }}
+          >
+            <p
+              style={{
+                fontSize: "18px",
+                font: "normal normal bold 18px/27px Segoe UI",
+                color: "#424446",
+              }}
+            >
+              Marwan Pablo <br />
+              <span style={{ font: "normal normal normal 18px/27px Segoe UI" }}>
+                class of 2019
+              </span>
+            </p>
+          </Grid>
+        </Grid>
+
 */

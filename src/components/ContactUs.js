@@ -15,7 +15,7 @@ const ContactUs = () => {
         position: "relative",
       }}
     >
-      <img
+      <Grid
         style={{
           width: "100%",
           height: "100%",
@@ -24,9 +24,11 @@ const ContactUs = () => {
           position: "absolute",
           top: 0,
           zIndex: -1,
+          overflow: 'hidden'
         }}
-        src={ContactUsImage}
-      />
+      >
+        <img style={{height: '800px', width: '100%', marginTop: '-40px'}} src={ContactUsImage} />
+      </Grid>
 
       <Grid
         container
