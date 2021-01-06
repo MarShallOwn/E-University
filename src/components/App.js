@@ -29,7 +29,7 @@ import Subject from "./Professor/Subject";
 import UsersList from "./Professor/UsersList";
 import StudentDetails from "./Professor/StudentDetails";
 import Professor from "./Professor/Professor";
-import Colleges from './Colleges';
+import Colleges from "./Colleges";
 
 //const history = createBrowserHistory()
 
