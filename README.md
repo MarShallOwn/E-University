@@ -10,7 +10,7 @@ A student can communicate with professors or other users and can check the video
 ## About
 The application uses the core features a person would want to use from software like E-University. In order to do that, the Todo example includes routing to make all of these items happen. Included features are:
 * Signup / login.
-  * Email verification before logging in is allowed.
+//Email verification before logging in is allowed.
 * Forgot password workflow.
 * View / edit profile details.
 * Give roles to specific user (example: admin, professor)
