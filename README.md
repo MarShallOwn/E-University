@@ -4,8 +4,8 @@ University E-System is a system where students and professors can communicate , 
 The Admin is responsible for adding the faculties, departments and levels , and
 approve professors sign up requests .
 A professor can choose a student and print his/her report, can communicate
-with students or other professors .
-A student can communicate with professors or other users .
+with students or other professors and is able to add lectures for the subjects that he is assigned to that contains videos and materials.
+A student can communicate with professors or other users and can check the videos and materials of the subjects he is learning.
 
 ## About
 The application uses the core features a person would want to use from software like E-University. In order to do that, the Todo example includes routing to make all of these items happen. Included features are:
