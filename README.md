@@ -17,6 +17,8 @@ The application uses the core features a person would want to use from software 
 * Change password while logged in.
 * communication between students and professors via chat.
 * allow admins and professors to write and print reports.
+* allow professors to add lectures for the subjects that he is assigned to that contains videos and materials.
+* allow students to check the videos and materials of the subjects he is learning.
 * Working with a MongoDB model (Todos) with a logged in user.
   * Create, read, update, delete Todos.
 * Authentication of a route before allowing access to the page.
