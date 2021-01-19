@@ -14,7 +14,7 @@ The application uses the core features a person would want to use from software 
 * View / edit profile details.
 * Give roles to specific user (example: admin, professor)
 * Change password while logged in.
-* communication between students and professors via realtime chat using Socket.IO.
+* communication between students and professors via real-time chat using Socket.IO.
 * allow admins and professors to write and print reports.
 * allow professors to add lectures for the subjects that he is assigned to that contains videos and materials.
 * allow students to check the videos and materials of the subjects he is learning.
