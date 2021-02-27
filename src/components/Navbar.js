@@ -13,6 +13,7 @@ import { useLoggedIn, useUser } from "../contexts/UserProvider";
 import { useStyles } from "./styleNavbar";
 import Axios from "axios";
 import Logo from "../assets/images/E-University-Logo.svg";
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 const routes = [
   "/",
@@ -21,7 +22,8 @@ const routes = [
   "/colleges",
   "/faculty",
   "/chat",
-  "/admin/create-user",
+  "/admin",
+  "/professor",
   "/register",
   "/login",
 ];
@@ -45,17 +47,26 @@ const Navbar = (props) => {
     handleClose();
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElAdmin, setAnchorElAdmin] = useState(null);
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
   };
 
+  const handleAdminClick = (e) => {
+    setActiveTab("/admin");
+    setAnchorElAdmin(e.currentTarget);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
+    setAnchorElAdmin(null);
   };
 
   const open = Boolean(anchorEl);
+
+  const open1 = Boolean(anchorElAdmin);
 
   return (
     <nav className={classes.root}>
@@ -151,7 +162,7 @@ const Navbar = (props) => {
               {activeTab === routes[3] && <span></span>}
             </li>
           </Link>
-          {user.email && (
+          {(user.email && !user.isProf) && (
             <Link
               onClick={() => setActiveTab("/faculty")}
               to={routes[4]}
@@ -173,11 +184,44 @@ const Navbar = (props) => {
             </Link>
           )}
           {user.isAdmin && (
-            <Link
-              onClick={() => setActiveTab("/admin/create-user")}
+            <li
               to={routes[6]}
               style={
-                activeTab === "/admin/create-user"
+                activeTab === "/admin"
+                  ? {
+                      fontWeight: "bold",
+                      position: "relative",
+                      margin: "0 1.7rem",
+                      height: "100%",
+                      color: "white",
+                      font: "normal normal 300 14px/23px Poppins",
+                    }
+                  : {
+                      margin: "0 1.7rem",
+                      height: "100%",
+                      color: "white",
+                      font: "normal normal 300 14px/23px Poppins",
+                    }
+              }
+              onClick={handleAdminClick}
+            >
+              Admin{" "}
+              <MdKeyboardArrowUp
+                style={
+                  open1
+                    ? { transform: "rotate(0deg)", transitionDuration: "1s" }
+                    : { transform: "rotate(180deg)", transitionDuration: "1s" }
+                }
+              />
+              {activeTab === routes[6] && <span></span>}
+            </li>
+          )}
+          {user.isProf && (
+            <Link
+              onClick={() => setActiveTab("/professor")}
+              to={routes[7]}
+              style={
+                activeTab === "/professor"
                   ? {
                       fontWeight: "bold",
                       position: "relative",
@@ -188,8 +232,8 @@ const Navbar = (props) => {
               }
             >
               <li>
-                Create User
-                {activeTab === routes[6] && <span></span>}
+                Professor
+                {activeTab === routes[7] && <span></span>}
               </li>
             </Link>
           )}
@@ -197,7 +241,7 @@ const Navbar = (props) => {
             <>
               <Link
                 onClick={() => setActiveTab("/register")}
-                to={routes[7]}
+                to={routes[8]}
                 style={
                   activeTab === "/register"
                     ? {
@@ -211,12 +255,12 @@ const Navbar = (props) => {
               >
                 <li>
                   Register
-                  {activeTab === routes[7] && <span></span>}
+                  {activeTab === routes[8] && <span></span>}
                 </li>
               </Link>
               <Link
                 onClick={() => setActiveTab("/login")}
-                to={routes[8]}
+                to={routes[9]}
                 style={
                   activeTab === "/login"
                     ? {
@@ -230,7 +274,7 @@ const Navbar = (props) => {
               >
                 <li>
                   Login
-                  {activeTab === routes[8] && <span></span>}
+                  {activeTab === routes[9] && <span></span>}
                 </li>
               </Link>
             </>
@@ -300,7 +344,11 @@ const Navbar = (props) => {
             <Grid container justify="flex-start">
               <Link
                 to="/profile"
-                style={{ textDecoration: "none", color: "black", width: "100%" }}
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                }}
               >
                 <Button
                   onClick={handleClose}
@@ -325,6 +373,67 @@ const Navbar = (props) => {
           </Grid>
         </Grid>
       </Popover>
+
+      <Popover
+        open={open1}
+        anchorEl={anchorElAdmin}
+        style={{ marginTop: "5px" }}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Grid style={{ padding: ".5rem" }}>
+          <Grid>
+            <Grid container justify="flex-start">
+              <Link
+                to="/admin/faculties-list"
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                }}
+              >
+                <Button
+                  onClick={handleClose}
+                  fullWidth
+                  style={{
+                    justifyContent: "flex-start",
+                    textTransform: "none",
+                  }}
+                >
+                  Faculties
+                </Button>
+              </Link>
+              <Divider />
+              <Link
+                to="/admin/users-list"
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  width: "100%",
+                }}
+              >
+                <Button
+                  onClick={handleClose}
+                  fullWidth
+                  style={{
+                    justifyContent: "flex-start",
+                    textTransform: "none",
+                  }}
+                >
+                  Users
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Popover>
     </nav>
   );
 };
@@ -339,4 +448,31 @@ export default withRouter(Navbar);
               <li>
                 <button onClick={logout}>Logout</button>
               </li>
+*/
+
+/*
+
+          {user.isAdmin && (
+            <Link
+              onClick={() => setActiveTab("/admin/create-user")}
+              to={routes[6]}
+              style={
+                activeTab === "/admin/create-user"
+                  ? {
+                      fontWeight: "bold",
+                      position: "relative",
+                      margin: "0 1.7rem",
+                      height: "100%",
+                    }
+                  : { margin: "0 1.7rem", height: "100%" }
+              }
+            >
+              <li>
+                Create User
+                {activeTab === routes[6] && <span></span>}
+              </li>
+            </Link>
+          )}
+
+
 */

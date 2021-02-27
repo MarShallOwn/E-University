@@ -17,19 +17,26 @@ import { useForm, Controller } from "react-hook-form";
 import Axios from "axios";
 import { set } from "lodash";
 
-const CreateUser = (props) => {
-  const { register, handleSubmit, errors, control } = useForm();
+const EditUser = (props) => {
 
-  const [isProf, setIsProf] = useState(false);
+    const user = props.location.state.user;
+
+    console.log(user)
+
+  const { register, handleSubmit, errors, control } = useForm({ defaultValues: {firstname: user.firstname, lastname: user.lastname, nationalID: user.nationalID, level: user.level, department: user.department } });
+
+  const [isProf, setIsProf] = useState(user.isProf);
   const [faculties, setFaculties] = useState([]);
-  const [selectedFaculty, setSelectedFaculty] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState(1);
-  const [showLevels, setShowLevels] = useState(false);
+  const [selectedFaculty, setSelectedFaculty] = useState(user.faculty);
+  const [selectedLevel, setSelectedLevel] = useState(user.level);
+  const [showLevels, setShowLevels] = useState(true);
   const [levels, setLevels] = useState(0);
   const [departments, setDepartments] = useState([]);
   const [error, setError] = useState(false);
 
-  const createUser = (data) => {
+  const EditUser = (data) => {
+
+    console.log(data)
     // reset the error state
     setError(false);
 
@@ -39,7 +46,7 @@ const CreateUser = (props) => {
       return;
     }
     // adding the rest of the data to the object
-    data = { ...data, isProf, level: selectedLevel, faculty: selectedFaculty };
+    data = { ...data, isProf, level: selectedLevel, faculty: selectedFaculty, _id: user._id };
     // if the selected level doesnt have departments then make it general
     if (departments.length === 0) data.department = "General"
     // if the user is prof them remove the level attribute and remove department attribute
@@ -49,8 +56,8 @@ const CreateUser = (props) => {
     } 
 
     // send a request to the api
-    Axios.post("/api/createUser", { data }).then(
-      (res) => res.data.status === 200 && props.history.push("/admin/users-list")
+    Axios.post("/api/adminEditUser", { data }).then(
+      (res) => res.data.pass && props.history.push("/admin/users-list")
     );
   };
 
@@ -59,11 +66,26 @@ const CreateUser = (props) => {
     Axios.get("/api/getFacultiesNames").then(
       (res) => res.data.pass && setFaculties(res.data.faculties)
     );
+
+    Axios.get(`/api/getFacultyLevels/${user.faculty}`).then((res) => {
+        res.data.pass && setLevels(res.data.levelsNumber);
+        !showLevels && setShowLevels(true);
+    })
+
+    if(!user.isProf){
+    Axios.get(
+        `/api/checkLevelHasDepartment/${user.faculty}/${parseInt(
+          selectedLevel
+        )}`
+      ).then(
+        (res) => res.data.pass && setDepartments(res.data.departments)
+      );
+
+    }
   }, []);
 
-  console.log(departments)
-
   const handleChange = (e) => {
+
     // if the element that triggered the onChange event is faculty
     if (e.target.name === "faculty") {
       setSelectedFaculty(e.target.value);
@@ -74,11 +96,21 @@ const CreateUser = (props) => {
         !showLevels && setShowLevels(true);
 
         // if the faculty element isn't empty then get a list departments if there is
-        if (e.target.value.trim() !== "") {
+        if (e.target.value.trim() !== "" && !user.isProf) {
+
+            // condition because a faculty like engineering got 5 years so when we switch to computer science the level will exceed
+            // the level of computer science faculty by one and it will throw error so if that happens we will make it choose the last level in the college
+            let searchedLevel;
+            if(selectedLevel > res.data.levelsNumber){
+                searchedLevel = res.data.levelsNumber; 
+                setSelectedLevel(res.data.levelsNumber);
+            }
+            else{
+                searchedLevel = selectedLevel;
+            }
+
           Axios.get(
-            `/api/checkLevelHasDepartment/${e.target.value}/${parseInt(
-              selectedLevel
-            )}`
+            `/api/checkLevelHasDepartment/${e.target.value}/${parseInt(searchedLevel)}`
           ).then(
             (res) => res.data.pass && setDepartments(res.data.departments)
           );
@@ -86,7 +118,7 @@ const CreateUser = (props) => {
       });
     } else if (e.target.name === "level") {
       setSelectedLevel(e.target.value);
-      if (selectedFaculty.trim() !== "") {
+      if (selectedFaculty.trim() !== "" && !user.isProf) {
         Axios.get(
           `/api/checkLevelHasDepartment/${selectedFaculty}/${parseInt(
             e.target.value
@@ -116,6 +148,7 @@ const CreateUser = (props) => {
         name="firstname"
         id="firstname"
         label="Firstname"
+        defaultValue={user.firstName}
         inputRef={register({
           required: true,
         })}
@@ -188,7 +221,7 @@ const CreateUser = (props) => {
         </FormControl>
       )}
 
-      {(departments.length !== 0 && !isProf) && (
+      {departments.length !== 0 && !isProf && (
         <>
           <FormControl
             component="fieldset"
@@ -199,7 +232,7 @@ const CreateUser = (props) => {
               control={control}
               name={"department"}
               rules={{ required: true }}
-              defaultValue=""
+              defaultValue={""}
               as={
                 <RadioGroup>
                   {levels !== 0 &&
@@ -229,12 +262,12 @@ const CreateUser = (props) => {
         style={{ marginTop: "2rem" }}
         variant="contained"
         color="primary"
-        onClick={handleSubmit(createUser)}
+        onClick={handleSubmit(EditUser)}
       >
-        Create User
+        Edit User
       </Button>
     </Grid>
   );
 };
 
-export default CreateUser;
+export default EditUser;

@@ -1265,6 +1265,9 @@ app.get("/api/profStudents", checkAuthenticated, (req, res) => {
   );
 });
 
+/**
+ * Filter students
+ */
 app.post("/api/filterStudents", checkAuthenticated, (req, res) => {
   const { filter: filtersData } = req.body;
 
@@ -1288,6 +1291,29 @@ app.post("/api/filterStudents", checkAuthenticated, (req, res) => {
   );
 });
 
+app.post("/api/filterUsers", checkAuthenticated, (req, res) => {
+  const { filter: filtersData } = req.body;
+
+  for (let filterData in filtersData) {
+    if (filterData !== "level" && filterData !== "isProf" && filterData !== "faculty") {
+      filtersData[filterData] = {
+        $regex: "^" + filtersData[filterData].value,
+        $options: "i",
+      };
+    } else {
+      filtersData[filterData] = filtersData[filterData].value;
+    }
+  }
+
+  userModel.find(
+    { ...filtersData },
+    "firstname lastname email nationalID faculty level department picture city isProf",
+    (err, users) => {
+      return res.send({ pass: true, users });
+    }
+  );
+});
+
 /**
  * Returns details of selected Student
  */
@@ -1301,6 +1327,74 @@ app.post("/api/studentDetails", checkAuthenticated, (req, res) => {
       return res.send({ pass: true, student });
     }
   );
+});
+
+/**
+ * List all the users to the admin User list page
+ */
+app.get("/api/adminUsers", checkAuthenticated, (req, res) => {
+  userModel.find(
+    {},
+    "firstname lastname email level faculty department picture city nationalID isProf",
+    (err, users) => {
+      if (err) return res.send({ pass: false });
+
+      return res.send({ pass: true, users });
+    }
+  );
+});
+
+
+/**
+ * Get selected user to be edited
+ */
+app.post("/api/userToBeEdited", checkAuthenticated, (req, res) => {
+  userModel.findOne({ _id: req.body.id }, (err, user) => {
+    if (err) return res.send({ pass: false });
+
+    return res.send({ pass: true, user });
+  });
+});
+
+/**
+ * Get selected user to be deleted
+ */
+app.post("/api/userToBeDeleted", checkAuthenticated, (req, res) => {
+  userModel.findOne({ _id: req.body.id }, (err, user) => {
+    if (err) return res.send({ pass: false });
+    
+    return res.send({ pass: true, user });
+  });
+});
+
+/**
+ * Delete Selected User
+ */
+app.post("/api/adminDeleteUser", checkAuthenticated, (req, res) => {
+  userModel.findOneAndDelete({ _id: req.body.id }, (err, user) => {
+    if (err) return res.send({ pass: false });
+    
+    return res.send({ pass: true });
+  });
+});
+
+app.post("/api/adminEditUser", checkAuthenticated, (req, res) => {
+  const {
+    _id,
+    firstname,
+    lastname,
+    nationalID,
+    faculty,
+    level,
+    department,
+    isProf,
+  } = req.body.data;
+
+  userModel.findOneAndUpdate({_id}, { firstname, lastname, faculty, nationalID, level, department, isProf, }, (err, user) => {
+    if(err) return res.send({pass: false})
+
+    return res.send({pass: true})
+  })
 });
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

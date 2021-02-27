@@ -41,6 +41,11 @@ const EditFaculty = (props) => {
     data.levels = data.levels.filter((item) => item !== null);
 
     for (let level in data.levels) {
+
+      if(parseInt(level) + 1 >= parseInt(departmentsLevel)){
+        data.levels[level].hasDepartments = true
+      }
+
       if (data.levels[level].subjects)
         data.levels[level].subjects = data.levels[level].subjects.filter(
           (item) => item !== null

@@ -10,7 +10,7 @@ import {
 } from "react-icons/md";
 import Axios from "axios";
 
-import NoVideoAvailable from '../../assets/images/no-video-available.jpg'
+import NoVideoAvailable from "../../assets/images/no-video-available.jpg";
 
 const Subject = (props) => {
   const subjectId = props.location.state.subjectId;
@@ -18,9 +18,6 @@ const Subject = (props) => {
   const [subject, setSubject] = useState(null);
 
   const [activeVideos, setActiveVideos] = useState(null);
-
-  console.log(subject);
-  console.log(activeVideos);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -73,7 +70,7 @@ const Subject = (props) => {
   // Switch to either the next or previous
   const handleVideoChange = (e, move, lectureIndex) => {
     let index = parseInt(e.currentTarget.id);
-    console.log(index)
+    console.log(index);
     const tempActiveVideos = [...activeVideos];
     let changed = false;
     if (move === "next") {
@@ -88,8 +85,8 @@ const Subject = (props) => {
           !changed
         ) {
           tempActiveVideos[lectureIndex].value = i;
-          
-            tempActiveVideos[lectureIndex].prev = true;
+
+          tempActiveVideos[lectureIndex].prev = true;
           changed = true;
           continue;
         } else if (
@@ -108,8 +105,8 @@ const Subject = (props) => {
           !changed
         ) {
           tempActiveVideos[lectureIndex].value = i;
-          
-            tempActiveVideos[lectureIndex].next = true;
+
+          tempActiveVideos[lectureIndex].next = true;
           changed = true;
           continue;
         } else if (
@@ -148,7 +145,7 @@ const Subject = (props) => {
               font: "normal normal normal 35px/90px Poppins",
             }}
           >
-            Business Management
+              { subject && subject.name }
           </p>
           <div
             style={{
@@ -262,8 +259,22 @@ const Subject = (props) => {
                       )}
                     </>
                   ) : (
-                    <Grid style={{ height: '133px', width: "265px", overflow: 'hidden', margin: '0 30px' }}>
-                      <img style={{height: '253px', marginLeft: '-90px', marginTop: '-75px'}} src={NoVideoAvailable} />
+                    <Grid
+                      style={{
+                        height: "133px",
+                        width: "265px",
+                        overflow: "hidden",
+                        margin: "0 30px",
+                      }}
+                    >
+                      <img
+                        style={{
+                          height: "253px",
+                          marginLeft: "-90px",
+                          marginTop: "-75px",
+                        }}
+                        src={NoVideoAvailable}
+                      />
                     </Grid>
                   )}
                 </Grid>
@@ -341,12 +352,19 @@ const Subject = (props) => {
                         width: "100%",
                         display: "block",
                         height: "100%",
+                        position: "relative"
                       }}
                       key={index}
                     >
                       <Grid container alignItems="center">
                         {icons[material.extension]}
-                        <p style={{ display: "inline-block" }}>
+                        <p
+                          style={{
+                            display: "inline-block",
+                            fontSize: "15px",
+                            fontFamily: "Poppins",
+                          }}
+                        >
                           {material.name}
                         </p>
                         <a
@@ -362,6 +380,10 @@ const Subject = (props) => {
                             style={{
                               backgroundColor: "#E24C3F",
                               color: "white",
+                              position: "absolute",
+                              top: "50%",
+                              right: "10px",
+                              transform: "translateY(-50%)",
                             }}
                           >
                             DOWNLOAD
@@ -385,14 +407,18 @@ const Subject = (props) => {
 export default Subject;
 
 const icons = {
-  pdf: <AiFillFilePdf style={{ display: "inline-block" }} />,
+  pdf: <AiFillFilePdf style={{ display: "inline-block", fontSize: "25px", margin: '0 5px' }} />,
   pptx: (
     <SiMicrosoftpowerpoint
-      style={{ display: "inline-block", fontSize: "20px" }}
+      style={{ display: "inline-block", fontSize: "25px", margin: '0 5px' }}
     />
   ),
-  docx: <SiMicrosoftword style={{ display: "inline-block" }} />,
-  doc: <SiMicrosoftword style={{ display: "inline-block" }} />,
+  docx: (
+    <SiMicrosoftword style={{ display: "inline-block", fontSize: "25px", margin: '0 5px' }} />
+  ),
+  doc: (
+    <SiMicrosoftword style={{ display: "inline-block", fontSize: "25px", margin: '0 5px' }} />
+  ),
 };
 
 /*

@@ -36,11 +36,11 @@ const Subjects = props => {
         <Grid>
             {
                 levels.map((level, index) => (
-                    <Grid key={index}>
+                    <Grid key={index} style={{marginLeft: '10px'}}>
                         <p>Level {level.level}</p>
                         {
                         level.subjects.map((subject, index) => (
-                            <Grid onClick={handleClick} container alignItems="center" key={index} id={subject._id} style={{margin: '20px 0', width: '300px', height: '50px', marginLeft: '20px', border: '1px solid black', borderRadius: '10px'}}>
+                            <Grid onClick={handleClick} container alignItems="center" justify="center" key={index} id={subject._id} style={{margin: '20px 0', width: '300px', height: '50px', marginLeft: '20px', border: '1px solid black', borderRadius: '10px'}}>
                                 <p>{subject.name}</p>
                             </Grid>
                         ))

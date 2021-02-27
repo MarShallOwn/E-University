@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Button } from "@material-ui/core";
+import { Link } from 'react-router-dom'
 import Axios from "axios";
 import { useStyles } from './style'
 import { MdModeEdit } from 'react-icons/md'
@@ -16,7 +17,7 @@ const FacultiesList = props => {
   }, []);
 
   const handleEdit = e => {
-      Axios.post("/api/facultyToBeEdited", { id: e.target.id }, { withCredentials: true })
+      Axios.post("/api/facultyToBeEdited", { id: e.currentTarget.id }, { withCredentials: true })
       .then(res => res.data.pass && props.history.push({
         pathname: '/admin/edit-faculty',
         state: { faculty: res.data.faculty }
@@ -25,8 +26,12 @@ const FacultiesList = props => {
 
   return (
     <Grid className={classes.table}>
-      <div style={{ overflowX: "auto" }}>
-        <table>
+      <div style={{ overflowX: "auto", paddingTop: "10px" }}>
+        <Link to="/admin/create-faculty" style={{textDecoration: 'none', marginLeft: "10px"}}>
+          <Button variant="contained" color="primary">Create Faculty</Button>
+        </Link>
+
+        <table style={{marginTop: '10px'}}>
           <tbody>
           <tr>
             <th>Name</th>
