@@ -62,6 +62,7 @@ const Faculty = () => {
       <Grid
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "center",
           marginBottom: "130px",
         }}
@@ -70,7 +71,8 @@ const Faculty = () => {
           faculty.level.subjects.map((subject, index) => (
             <Link
             style={{
-              textDecoration: 'none'
+              textDecoration: 'none',
+              margin: '10px 0'
             }}
             to={{
               pathname: '/faculty/subject',

@@ -30,7 +30,8 @@ const Subject = (props) => {
     control,
     subjectNumber,
     subject,
-    professors
+    professors,
+    setValue,
   } = props;
 
   const [term, setTerm] = useState(1);
@@ -42,6 +43,11 @@ const Subject = (props) => {
 
   useEffect(() => {
     setSelectedDepartments(subject ? subject.departments : Array(departments.length - 1).fill(false));
+    
+    if((subject) && (subject.lectures.length !== 0)){
+      register(`levels.${level}.subjects.${subjectNumber}.lectures`)
+      setValue(`levels.${level}.subjects.${subjectNumber}.lectures`, subject.lectures)
+    }
   }, [departments, hasDepartments]);
 
   const selectDepartmentsChange = (e) => {

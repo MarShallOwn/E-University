@@ -18,7 +18,7 @@ const Level = (props) => {
     levelData,
     professors,
     hasDepartments,
-    setValue = { setValue },
+    setValue,
   } = props;
 
   const [subjectsNumber, setSubjectsNumber] = useState(() => {
@@ -53,6 +53,7 @@ const Level = (props) => {
       level={level}
       subjectNumber={index + 1}
       control={control}
+      setValue={setValue}
       subject={levelData ? levelData.subjects[index] : null}
       professors={professors}
     />
