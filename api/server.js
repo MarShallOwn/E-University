@@ -4,7 +4,6 @@ const app = express();
 const http = require("http");
 const mongoose = require("mongoose");
 const passport = require("passport");
-const bodyParser = require("body-parser");
 const session = require("express-session");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -26,8 +25,8 @@ const bcrypt = require("bcrypt");
 const { json } = require("body-parser");
 const PORT = process.env.PORT || 8080;
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 /**
  * Google OAuth config
  */
@@ -92,7 +91,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage,
-  limits: { fileSize: 50000000 },
+  //limits: { fileSize: 1000000000 },
 });
 
 mongoose.connect(process.env.DATABASE, {
@@ -470,7 +469,6 @@ app.post(
  * Update user's Profile details
  */
 app.post("/api/updateProfile", checkAuthenticated, (req, res) => {
-
   userModel.findOneAndUpdate(
     { email: req.user.email },
     { ...req.body.data },
@@ -850,14 +848,23 @@ app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
     let latestFiles = [];
     let latestVideos = [];
 
-    for(let subject of doc.levels[req.user.level - 1].subjects){
-      for(let lecture of subject.lectures){
-        for(let material of lecture.materials){
-          if(material.type === "file"){
-            latestFiles.push({...material._doc, professor: subject.professor, subjectName: subject.name, lectureNumber: lecture.lectureNumber})
-          }
-          else if(material.type === "video"){
-            latestVideos.push({...material._doc, professor: subject.professor, subjectName: subject.name, lectureNumber: lecture.lectureNumber})
+    for (let subject of doc.levels[req.user.level - 1].subjects) {
+      for (let lecture of subject.lectures) {
+        for (let material of lecture.materials) {
+          if (material.type === "file") {
+            latestFiles.push({
+              ...material._doc,
+              professor: subject.professor,
+              subjectName: subject.name,
+              lectureNumber: lecture.lectureNumber,
+            });
+          } else if (material.type === "video") {
+            latestVideos.push({
+              ...material._doc,
+              professor: subject.professor,
+              subjectName: subject.name,
+              lectureNumber: lecture.lectureNumber,
+            });
           }
         }
       }
@@ -873,25 +880,29 @@ app.get("/api/getUserFaculty", checkAuthenticated, (req, res) => {
       level,
       department: req.user.department,
       latestFiles,
-      latestVideos
+      latestVideos,
     };
 
     return res.send({ pass: true, faculty });
   });
 });
 
-app.get("/api/getStudentSubject/:subjectId", checkAuthenticated,  (req, res) => {
-  const { subjectId } = req.params
+app.get("/api/getStudentSubject/:subjectId", checkAuthenticated, (req, res) => {
+  const { subjectId } = req.params;
 
-  facultyModel.findOne({name: req.user.faculty}, (err, faculty) => {
-    if(err) return res.send({pass: false})
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
 
-    const level = faculty.levels.find((level, index) => index === (req.user.level - 1));
-    const subject = level.subjects.find(subject => subject._id.toString() === subjectId)
+    const level = faculty.levels.find(
+      (level, index) => index === req.user.level - 1
+    );
+    const subject = level.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
 
-    return res.send({pass: true, subject})
-  })
-})
+    return res.send({ pass: true, subject });
+  });
+});
 
 /**
  *  Get all Faculties in an array to be shown in a list
@@ -978,6 +989,311 @@ app.get("/api/professorSubjects", checkAuthenticated, (req, res) => {
   );
 });
 
+app.post("/api/professor/get-exam", checkAuthenticated, (req, res) => {
+  let { level, subjectId, examId } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === level - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    const exam = docSubject.exams.find(exam => exam._id.toString() === examId);
+
+    faculty.save();
+    return res.send({ pass: true, exam });
+})
+})
+
+app.post("/api/professor/exams-list", checkAuthenticated, (req, res) => {
+  let { level, subjectId } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === level - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    const chaptersNumber =  docSubject.questionBank.chaptersNumber
+
+    const result = {exams: docSubject.exams, subjectId, level, chaptersNumber}
+
+    return res.send({ pass: true, result });
+})
+})
+
+
+app.post("/api/professor/add-exam", checkAuthenticated, (req, res) => {
+  let { newExam, level, subjectId } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === level - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    let isExam = false;
+    const oldExam = docSubject.exams.find(exam => {
+      if(exam._id.toString() === newExam._id){
+        isExam = true;
+        return true;
+      }
+      else{
+        return false;
+      }
+    })
+
+    if(isExam){
+      oldExam.duration = newExam.duration;
+      oldExam.examDate = newExam.examDate;
+      oldExam.examEndTime = newExam.examEndTime;
+      oldExam.chapters = newExam.chapters;
+      oldExam.examName = newExam.examName;
+      oldExam.type = newExam.type;
+      oldExam.shortEssay = newExam.shortEssay;
+      oldExam.longEssay = newExam.longEssay;
+      oldExam.ChooseCorrectAnswer = newExam.ChooseCorrectAnswer;
+      oldExam.ChooseMultipleCorrectAnswers = newExam.ChooseMultipleCorrectAnswers;
+      oldExam.trueOrFalse = newExam.trueOrFalse;
+      oldExam.conditions = newExam.conditions;
+    }
+    else{
+      docSubject.exams.push({
+        ...newExam,
+        createdAt: new Date(),
+      });
+    }
+
+
+    faculty.save();
+    return res.send({ pass: true });
+})
+})
+
+
+app.post("/api/professor/question-bank/chapters-number", checkAuthenticated, (req, res) => {
+
+  const { chaptersNumber, subjectId, level } = req.body;
+
+  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === level - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    docSubject.questionBank.chaptersNumber = chaptersNumber
+
+    faculty.save().then(doc => {
+      return res.send({ pass: true })
+    })
+  })
+})
+
+app.post(
+  "/api/professor/question-bank/edit-question",
+  checkAuthenticated,
+  upload.array("multi-files"),
+  (req, res) => {
+    let { newQuestion, level, subjectId } = req.body;
+
+    newQuestion = JSON.parse(newQuestion);
+    level = JSON.parse(level);
+    subjectId = JSON.parse(subjectId);
+
+    facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+      if (err) return res.send({ pass: false });
+
+      const docLevel = faculty.levels.find(
+        (level1, index) => index === level - 1
+      );
+
+      const docSubject = docLevel.subjects.find(
+        (subject) => subject._id.toString() === subjectId
+      );
+
+      const docQuestion = docSubject.questionBank.questions.find(
+        (question) => question._id.toString() === newQuestion._id
+      )
+
+
+      // get the file linkes that got deleted to a deletedMediaList
+      const deletedMediaList = [];
+      for(let oldMedia of docQuestion.media){
+        if(!newQuestion.oldMedia.find(newMedia => oldMedia === newMedia)){
+          deletedMediaList.push(oldMedia)
+        }
+      }
+
+      // delete deleted media from cloudinary;
+      for(let deletedMedia of deletedMediaList){
+        const resourceType = {};
+        if(deletedMedia.type !== "image"){
+          resourceType.resource_type = "video"
+        }
+        await cloudinary.uploader.destroy(deletedMedia.file, deletedMedia.type !== "image" ? {resource_type: "video"}: {});
+      }
+
+      const files = [];
+
+      // if upload files exists then upload each file to cloudinary using forloop and then getting the data from cloudinary
+      // to store it then to the database
+      if (req.files.length !== 0) {
+        for (let file of req.files) {
+          const ext = file.originalname.split(".")[
+            file.originalname.split(".").length - 1
+          ];
+
+          let cloudinaryResult;
+          const mediaType = file.mimetype.split("/")[0]
+          
+          try{
+            if(mediaType === "image"){
+              cloudinaryResult = await cloudinary.uploader.upload(file.path, {
+                folder: "e-university-profile-pictures/question-bank-media",
+                use_filename: true,
+              });
+            }
+            else{
+              cloudinaryResult = await cloudinary.uploader.upload(file.path, {
+                resource_type: "video",
+                folder: "e-university-profile-pictures/question-bank-media",
+                use_filename: true,
+              });
+            }           
+          } catch(err){
+            console.log(err);
+          } 
+
+
+          files.push({
+            type: mediaType,
+            file: cloudinaryResult.public_id,
+            ext,
+            createdAt: new Date(),
+          });
+        }
+      }
+
+      // combining oldMedia that was already stored or that got element deleted and the new files that are uploaded
+      newQuestion.media = [...newQuestion.oldMedia, ...files];
+
+      docQuestion.questionName = newQuestion.questionName;
+      docQuestion.difficulty = newQuestion.difficulty;
+      docQuestion.chapterNumber = newQuestion.chapterNumber;
+      docQuestion.questionType = newQuestion.questionType;
+      docQuestion.answers = newQuestion.answers;
+      docQuestion.media = newQuestion.media;
+      docQuestion.correctAnswers = newQuestion.correctAnswers;
+
+      faculty.save().then(doc => {
+        return res.send({ pass: true });
+      });
+      return res.send({ pass: false });
+    });
+  }
+);
+
+
+
+/**
+ * Add Question to question back of the specific subject
+ */
+app.post(
+  "/api/professor/question-bank/add-question",
+  checkAuthenticated,
+  upload.array("multi-files"),
+  (req, res) => {
+    let { newQuestion, level, subjectId } = req.body;
+
+    newQuestion = JSON.parse(newQuestion);
+    level = JSON.parse(level);
+    subjectId = JSON.parse(subjectId);
+
+    facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+      if (err) return res.send({ pass: false });
+
+      const docLevel = faculty.levels.find(
+        (level1, index) => index === level - 1
+      );
+
+      const docSubject = docLevel.subjects.find(
+        (subject) => subject._id.toString() === subjectId
+      );
+
+      const files = [];
+
+      // if upload files exists then upload each file to cloudinary using forloop and then getting the data from cloudinary
+      // to store it then to the database
+      if (req.files.length !== 0) {
+        for (let file of req.files) {
+          const ext = file.originalname.split(".")[
+            file.originalname.split(".").length - 1
+          ];
+
+          let cloudinaryResult;
+          const mediaType = file.mimetype.split("/")[0]
+          
+          try{
+            if(mediaType === "image"){
+              cloudinaryResult = await cloudinary.uploader.upload(file.path, {
+                folder: "e-university-profile-pictures/question-bank-media",
+                use_filename: true,
+              });
+            }
+            else{
+              cloudinaryResult = await cloudinary.uploader.upload(file.path, {
+                resource_type: "video",
+                folder: "e-university-profile-pictures/question-bank-media",
+                use_filename: true,
+              });
+            }           
+          } catch(err){
+            console.log(err);
+          } 
+
+
+          files.push({
+            type: mediaType,
+            file: cloudinaryResult.public_id,
+            ext,
+            createdAt: new Date(),
+          });
+        }
+      }
+
+      newQuestion.media = files;
+
+      docSubject.questionBank.questions.push({
+        ...newQuestion,
+        createdAt: new Date(),
+      });
+
+      faculty.save();
+      return res.send({ pass: true });
+    });
+  }
+);
+
 /**
  * Get Subject that the professor selected
  */
@@ -1061,14 +1377,12 @@ app.post("/api/professor/delete-lecture", checkAuthenticated, (req, res) => {
   });
 });
 
-const getYoutubeVideoId = url => {
+const getYoutubeVideoId = (url) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
 
-  return (match && match[2].length === 11)
-    ? match[2]
-    : null;
-}
+  return match && match[2].length === 11 ? match[2] : null;
+};
 
 const videoOrFileUpload = (
   req,
@@ -1101,14 +1415,14 @@ const videoOrFileUpload = (
             type: newMaterial.type,
             name: newMaterial.name,
             link: getYoutubeVideoId(newMaterial.link),
-            createdAt: new Date()
+            createdAt: new Date(),
           }
         : {
             type: newMaterial.type,
             name: newMaterial.name,
             file: result.public_id,
             extension: ext,
-            createdAt: new Date()
+            createdAt: new Date(),
           }
     );
 
@@ -1235,9 +1549,8 @@ app.post("/api/professor/lecture/delete-material", (req, res) => {
       );
     } else if (deletedMaterial[0].type === "video") {
       return res.send({ pass: true, subject: docSubject });
-    }
-    else{
-      return res.send({pass: false});
+    } else {
+      return res.send({ pass: false });
     }
   });
 });
@@ -1295,7 +1608,11 @@ app.post("/api/filterUsers", checkAuthenticated, (req, res) => {
   const { filter: filtersData } = req.body;
 
   for (let filterData in filtersData) {
-    if (filterData !== "level" && filterData !== "isProf" && filterData !== "faculty") {
+    if (
+      filterData !== "level" &&
+      filterData !== "isProf" &&
+      filterData !== "faculty"
+    ) {
       filtersData[filterData] = {
         $regex: "^" + filtersData[filterData].value,
         $options: "i",
@@ -1344,7 +1661,6 @@ app.get("/api/adminUsers", checkAuthenticated, (req, res) => {
   );
 });
 
-
 /**
  * Get selected user to be edited
  */
@@ -1362,7 +1678,7 @@ app.post("/api/userToBeEdited", checkAuthenticated, (req, res) => {
 app.post("/api/userToBeDeleted", checkAuthenticated, (req, res) => {
   userModel.findOne({ _id: req.body.id }, (err, user) => {
     if (err) return res.send({ pass: false });
-    
+
     return res.send({ pass: true, user });
   });
 });
@@ -1373,7 +1689,7 @@ app.post("/api/userToBeDeleted", checkAuthenticated, (req, res) => {
 app.post("/api/adminDeleteUser", checkAuthenticated, (req, res) => {
   userModel.findOneAndDelete({ _id: req.body.id }, (err, user) => {
     if (err) return res.send({ pass: false });
-    
+
     return res.send({ pass: true });
   });
 });
@@ -1390,11 +1706,15 @@ app.post("/api/adminEditUser", checkAuthenticated, (req, res) => {
     isProf,
   } = req.body.data;
 
-  userModel.findOneAndUpdate({_id}, { firstname, lastname, faculty, nationalID, level, department, isProf, }, (err, user) => {
-    if(err) return res.send({pass: false})
+  userModel.findOneAndUpdate(
+    { _id },
+    { firstname, lastname, faculty, nationalID, level, department, isProf },
+    (err, user) => {
+      if (err) return res.send({ pass: false });
 
-    return res.send({pass: true})
-  })
+      return res.send({ pass: true });
+    }
+  );
 });
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
