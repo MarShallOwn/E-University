@@ -33,6 +33,9 @@ import Colleges from "./Colleges";
 import AdminUsersList from "./Admin/User/Users";
 import AdminEditUser from "./Admin/User/EditUser";
 import AdminDeleteUser from "./Admin/User/DeleteUser";
+import QuestionBank from "./Professor/QuestionBank/QuestionBank";
+import ProfExam from "./Professor/Exam/Exam"
+import ExamsList from "./Professor/Exam/ExamsList"
 
 //const history = createBrowserHistory()
 
@@ -57,7 +60,10 @@ const App = () => {
             <Auth path="/admin/edit-user" component={AdminEditUser} />
             <Auth path="/admin/delete-user" component={AdminDeleteUser} />
             <Auth path="/professor/subjects" component={Subjects} />
-            <Auth path="/professor/subject" component={Subject} />
+            <Auth exact path="/professor/subject" component={Subject} />
+            <Auth path="/professor/subject/question-bank" component={QuestionBank} />
+            <Auth path="/professor/subject/exams-list" component={ExamsList} />
+            <Auth path="/professor/subject/exam" component={ProfExam} />
             <Auth path="/professor/students" component={UsersList} />
             <Auth exact path="/professor" component={Professor} />
             <Auth path="/professor/student-details" component={StudentDetails} />

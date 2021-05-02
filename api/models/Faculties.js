@@ -32,6 +32,148 @@ const lectureSchema = new Schema({
     materials: [materialSchema]
 })
 
+/*
+const answerSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    chosenTimes: {
+        type: String,
+        default: 0
+    }
+})
+*/
+
+const ConditionSchema = new Schema({
+    chapter: {
+        type: Number,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    difficulty: {
+        type: String,
+        required: true,
+    },
+    numberOfQuestions: {
+        type: Number,
+        required: true
+    }
+})
+
+const ExamSchema = new Schema({
+    subjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    duration: {
+        type: String,
+        required: true
+    },
+    examDate: {
+        type: Date,
+        required: true,
+    },
+    examEndTime: {
+        type: Date,
+        required: true,
+    },
+    chapters: {
+        type: Schema.Types.Mixed,
+        required: true
+    },
+    examName: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    shortEssay: {
+        type: Number,
+        required: true
+    },
+    longEssay: {
+        type: Number,
+        required: true
+    },
+    chooseCorrectAnswer: {
+        type: Number,
+        required: true
+    },
+    chooseMultipleCorrectAnswers: {
+        type: Number,
+        required: true
+    },
+    trueOrFalse: {
+        type: Number,
+        required: true
+    }, 
+    conditions: [ConditionSchema]
+})
+
+const mediaSchema = new Schema({
+    type: {
+        type: String,
+        required: true
+    },
+    file: String,
+    extension: String,
+    createdAt: {
+        type: Date,
+        required: true
+    }
+})
+
+const questionSchema = new Schema({
+    questionName: {
+        type: String,
+        required: true
+    },
+    difficulty: {
+        type: String,
+        required: true
+    },
+    chapterNumber: {
+        type: Number,
+        required: true
+    },
+    questionType: {
+        type: String,
+        required: true
+    },
+    answers: Array,
+    whoAnswered : {
+        type: Number
+    },
+    whoAnsweredCorrectly: {
+        type: Number
+    },
+    createdAt: {
+        type: Date,
+        required: true
+    },
+    media: {
+        type: [mediaSchema],
+        default: []
+    }
+    ,
+    correctAnswers: {}
+})
+
+const questionBankSchema = new Schema({
+    chaptersNumber: Number,
+    questions: {
+        type: [questionSchema],
+        default: []
+    }
+
+})
+
 const subjectSchema = new Schema({
     name: {
         type: String,
@@ -54,7 +196,12 @@ const subjectSchema = new Schema({
         required: true
     },
     departments: Array,
-    lectures: [lectureSchema]
+    lectures: [lectureSchema],
+    questionBank: {
+        type: questionBankSchema,
+        default: {}
+    },
+    exams : [ExamSchema]
 })
 
 const levelSchema = new Schema({
