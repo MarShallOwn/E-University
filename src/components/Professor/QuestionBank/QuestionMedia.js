@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@material-ui/core'
+import { Grid, Button } from '@material-ui/core'
 
 const QuestionMedia = props => {
 
@@ -41,9 +41,9 @@ const QuestionMedia = props => {
 
 
     return(
-        <>
+        <Grid style={{margin: '0 .7rem'}}>
         {media}
-        </>
+        </Grid>
     )
 }
 

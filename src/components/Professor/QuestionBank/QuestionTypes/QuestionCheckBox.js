@@ -23,10 +23,11 @@ const QuestionCheckBox = props => {
     }
 
     return(
-        <Grid>
+        <Grid style={buttonDisabled ? {display: 'flex'} : {}}>
         {answers.map((answer, index) => (
           <div>
           <FormControlLabel
+          style={{font: 'normal normal 600 12px/25px Poppins'}}
           key={index}
             control={
               <Checkbox

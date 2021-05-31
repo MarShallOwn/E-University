@@ -63,8 +63,8 @@ const Faculty = () => {
         style={{
           display: "flex",
           flexWrap: "wrap",
-          justifyContent: "center",
           marginBottom: "130px",
+          marginTop: "100px"
         }}
       >
         {faculty.level.subjects &&
@@ -84,7 +84,7 @@ const Faculty = () => {
               style={{
                 width: "561px",
                 height: "146px",
-                margin: "0 30px",
+                margin: "20px 30px",
                 border: "1px solid #9696A0",
                 borderRadius: "10px",
                 textAlign: "center",
@@ -98,6 +98,7 @@ const Faculty = () => {
                   style={{
                     lineHeight: "0",
                     font: "normal normal normal 25px/0px Poppins",
+                    color: "black",
                     fontSize: "25px",
                   }}
                 >

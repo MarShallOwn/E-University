@@ -2,21 +2,34 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import {
   Grid,
-  TextField,
-  Radio,
-  FormControlLabel,
-  RadioGroup,
-  Checkbox,
   Button,
+  Stepper,
+  Step,
+  StepLabel
 } from "@material-ui/core";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker,
-  KeyboardTimePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import Conditions from "./Conditions";
 import moment from "moment";
+import ExamInformation from "./ExamInformation";
+import ExamCondition from "./ExamCondition";
+import ExamPreview from "./ExamPreview";
+import ExamStructureDone from "./ExamStructureDone";
+
+
+function getSteps() {
+  return ['Exam information', 'Exam Condition', 'Exam Preview'];
+}
+
+function getStepContent(step) {
+  switch (step) {
+    case 0:
+      return 'Select campaign settings...';
+    case 1:
+      return 'What is an ad group anyways?';
+    case 2:
+      return 'This is the bit I really care about!';
+    default:
+      return 'Unknown step';
+  }
+}
 
 const Exam = (props) => {
   const { subjectId, level, examId, chaptersNumber } = props.location.state;
@@ -40,6 +53,61 @@ const Exam = (props) => {
   const [durationHour, setDurationHour] = useState("");
   const [durationMin, setDurationMin] = useState("");
   const [durationSec, setDurationSec] = useState("");
+  const [examMark, setExamMark] = useState(0);
+  ////// Stepper code
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set());
+  const steps = getSteps();
+
+  console.log(activeStep);
+
+  const isStepOptional = (step) => {
+    return step === 1;
+  };
+
+  const isStepSkipped = (step) => {
+    return skipped.has(step);
+  };
+
+  const handleNext = () => {
+    let newSkipped = skipped;
+    let maxTimeLine = 3;
+    if (isStepSkipped(activeStep)) {
+      newSkipped = new Set(newSkipped.values());
+      newSkipped.delete(activeStep);
+    }
+
+    if(activeStep === maxTimeLine){
+      !examId ? addExam() : editExam();
+    }
+
+    if(activeStep < maxTimeLine) setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped(newSkipped);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleSkip = () => {
+    if (!isStepOptional(activeStep)) {
+      // You probably want to guard against something like this,
+      // it should never occur unless someone's actively trying to break something.
+      throw new Error("You can't skip a step that isn't optional.");
+    }
+
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped((prevSkipped) => {
+      const newSkipped = new Set(prevSkipped.values());
+      newSkipped.add(activeStep);
+      return newSkipped;
+    });
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+  //////
 
   useEffect(() => {
     if (examId) {
@@ -67,11 +135,34 @@ const Exam = (props) => {
             setTrueOrFalse(exam.trueOrFalse);
             setConditions(exam.conditions);
             setExamName(exam.examName);
+            setExamMark(exam.examMark)
           }
         }
       );
     }
   }, []);
+
+  const getQuestionTypeMark = type => {
+
+
+    if(type === "shortEssay") return shortEssay
+    if(type === "longEssay") return longEssay
+    if(type === "chooseCorrectAnswer") return chooseCorrectAnswer
+    if(type === "chooseMultipleCorrectAnswers") return chooseMultipleCorrectAnswers
+    if(type === "trueOrFalse") return trueOrFalse
+
+    return 0
+  }
+
+  // Count the total exam mark depending on number of questions and there mark
+  useEffect(() => {
+    let mark = 0;
+    conditions.map(condition => {
+      let conditionMark = condition.numberOfQuestions * getQuestionTypeMark(condition.type);
+      mark += conditionMark
+    })
+    setExamMark(mark);
+  }, [conditions, shortEssay, longEssay, chooseCorrectAnswer, chooseMultipleCorrectAnswers, trueOrFalse])
  
   const collectInformation = () => {
     const duration = moment(
@@ -94,12 +185,13 @@ const Exam = (props) => {
       chooseMultipleCorrectAnswers,
       trueOrFalse,
       conditions,
+      examMark
     };
 
     return newExam
   }
 
-  const AddExam = () => {
+  const addExam = () => {
 
     const newExam = collectInformation();
 
@@ -154,163 +246,78 @@ const Exam = (props) => {
   };
 
   return (
-    <Grid>
-      <TextField
-        value={examName}
-        onChange={(e) => setExamName(e.target.value)}
-        label="Exam Name"
-      />
-      <RadioGroup
-        value={examType}
-        onChange={(e) => setExamType(e.target.value)}
+    <Grid style={{ height: "calc(100vh - 3.5rem)" }}>
+        <Grid>
+        <Grid
+          style={{
+            position: "relative",
+            width: "fit-content",
+            margin: "0 auto",
+            padding: "0 13px",
+          }}
+        >
+          <p
+            style={{
+              color: "#2C4563",
+              textAlign: "center",
+              fontSize: "35px",
+              font: "normal normal 600 35px/53px Poppins",
+            }}
+          >
+            Exam Structure
+          </p>
+          <div
+            style={{
+              position: "absolute",
+              left: "0",
+              bottom: "0",
+              width: "70px",
+              height: "4px",
+              backgroundColor: "#FFE05D",
+            }}
+          ></div>
+        </Grid>
+      </Grid>
+
+      <Grid
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        Exam Type
-        <FormControlLabel
-          value="RealExam"
-          control={<Radio />}
-          label="Real Exam"
-        />
-        <FormControlLabel value="Test" control={<Radio />} label="Test" />
-      </RadioGroup>
-      <Grid style={{ display: "block" }}>
-        Duration
-        <TextField
-          type="number"
-          name="hour"
-          onChange={timeCondition}
-          value={durationHour}
-          label="hour"
-        />
-        <TextField
-          type="number"
-          name="min"
-          onChange={timeCondition}
-          value={durationMin}
-          label="min"
-        />
-        <TextField
-          type="number"
-          name="sec"
-          onChange={timeCondition}
-          value={durationSec}
-          label="sec"
-        />
+
+
+        <Grid style={{display: 'flex', alignItems: "center", flexDirection: 'column', width : '80%', border: '1px solid #1C60B3', borderRadius: '5px', padding: '5rem' }}>
+            <Stepper activeStep={activeStep} alternativeLabel style={{width: '100%'}}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel><p style={{font: 'normal normal 600 16px/25px Poppins'}}>{label}</p></StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+      <Grid style={{width: '75%'}}>
+        {
+          activeStep === 0 && <ExamInformation examName={examName} setExamName={setExamName} examType={examType} setExamType={setExamType} timeCondition={timeCondition} durationHour={durationHour} durationMin={durationMin} durationSec={durationSec} selectedStartExamDate={selectedStartExamDate} setSelectedStartExamDate={setSelectedStartExamDate} selectedEndExamDate={selectedEndExamDate} setSelectedEndExamDate={setSelectedEndExamDate} />
+        }
+        {
+          activeStep === 1 && <ExamCondition chaptersNumber={chaptersNumber} examChapter={examChapter} setExamChapter={setExamChapter} shortEssay={shortEssay} setShortEssay={setShortEssay} longEssay={longEssay} setLongEssay={setLongEssay} chooseCorrectAnswer={chooseCorrectAnswer} setChooseCorrectAnswer={setChooseCorrectAnswer} chooseMultipleCorrectAnswers={chooseMultipleCorrectAnswers} setChooseMultipleCorrectAnswers={setChooseMultipleCorrectAnswers} trueOrFalse={trueOrFalse} setTrueOrFalse={setTrueOrFalse} conditions={conditions} setConditions={setConditions} />
+        }
+        {
+          activeStep === 2 && <ExamPreview />
+        }
+        {
+          activeStep === 3 && <ExamStructureDone />
+        }
       </Grid>
-      <p>Exam Start</p>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
-          margin="normal"
-          id="date-picker-dialog"
-          label="Date picker dialog"
-          format="MM/dd/yyyy"
-          value={selectedStartExamDate}
-          onChange={(date) => setSelectedStartExamDate(date)}
-          KeyboardButtonProps={{
-            "aria-label": "change date",
-          }}
-        />
-        <KeyboardTimePicker
-          margin="normal"
-          id="time-picker"
-          label="Time picker"
-          value={selectedStartExamDate}
-          onChange={(date) => setSelectedStartExamDate(date)}
-          KeyboardButtonProps={{
-            "aria-label": "change time",
-          }}
-        />
-      </MuiPickersUtilsProvider>
-      <p>Exam End</p>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
-          margin="normal"
-          id="date-picker-dialog"
-          label="Date picker dialog"
-          format="MM/dd/yyyy"
-          value={selectedEndExamDate}
-          onChange={(date) => setSelectedEndExamDate(date)}
-          KeyboardButtonProps={{
-            "aria-label": "change date",
-          }}
-        />
-        <KeyboardTimePicker
-          margin="normal"
-          id="time-picker"
-          label="Time picker"
-          value={selectedEndExamDate}
-          onChange={(date) => setSelectedEndExamDate(date)}
-          KeyboardButtonProps={{
-            "aria-label": "change time",
-          }}
-        />
-      </MuiPickersUtilsProvider>
-      <Grid style={{ display: "block" }}>
-        <TextField
-          value={shortEssay}
-          onChange={(e) => setShortEssay(parseInt(e.target.value))}
-          style={{ width: "16rem", margin: "0 1rem" }}
-          label="Short Essay"
-          type="number"
-          InputProps={{ inputProps: { min: 1, max: 15 } }}
-        />
-        <TextField
-          value={longEssay}
-          onChange={(e) => setLongEssay(parseInt(e.target.value))}
-          style={{ width: "16rem", margin: "0 1rem" }}
-          label="Long Essay"
-          type="number"
-          InputProps={{ inputProps: { min: 1, max: 15 } }}
-        />
-        <TextField
-          value={chooseCorrectAnswer}
-          onChange={(e) => setChooseCorrectAnswer(parseInt(e.target.value))}
-          style={{ width: "16rem", margin: "0 1rem" }}
-          label="Choose Correct Answer"
-          type="number"
-          InputProps={{ inputProps: { min: 1, max: 5 } }}
-        />
-        <TextField
-          value={chooseMultipleCorrectAnswers}
-          onChange={(e) =>
-            setChooseMultipleCorrectAnswers(parseInt(e.target.value))
-          }
-          style={{ width: "16rem", margin: "0 1rem" }}
-          label="Choose Multiple Correct Answers"
-          type="number"
-          InputProps={{ inputProps: { min: 1, max: 5 } }}
-        />
-        <TextField
-          value={trueOrFalse}
-          onChange={(e) => setTrueOrFalse(parseInt(e.target.value))}
-          style={{ width: "16rem", margin: "0 1rem" }}
-          label="True or False"
-          type="number"
-          InputProps={{ inputProps: { min: 1, max: 5 } }}
-        />
+      <Grid style={{width: '75%', display: 'flex', justifyContent: 'space-between', marginTop: '3rem'}}>
+        <Button disabled={activeStep === 0} onClick={handleBack} variant="outlined" style={{textTransform: 'none', color: '#333333', font: 'normal normal 600 14px/25px Poppins', height: "3rem", width: '10rem', borderRadius: '10px', borderWidth: '2px'}}>Previous Page</Button>
+        <Button onClick={handleNext} style={{backgroundColor: '#1C60B3', textTransform: 'none', color: 'white', font: 'normal normal 600 14px/25px Poppins', height: "3rem", width: '10rem'}}>{activeStep >= steps.length - 1 ? 'Done' : 'Next Page'}</Button>
       </Grid>
-      {
-        Array(chaptersNumber).fill(null).map((chapter, index) => (
-          <FormControlLabel
-          key={Math.random()}
-          control={
-            <Checkbox
-              checked={examChapter[index+1]}
-              onChange={(e) =>
-                setExamChapter({
-                  ...examChapter,
-                  [e.target.name]: e.target.checked,
-                })
-              }
-              name={index+1}
-            />
-          }
-          label={`Chapter ${index+1}`}
-        />
-        ))
-      }
-      <Conditions conditions={conditions} setConditions={setConditions} />
-      {!examId && <Button onClick={AddExam}>Add Exam</Button>}
-      {examId && <Button onClick={editExam}>Edit Exam</Button>}
+        </Grid>
+        </Grid>
+      <p>Exam Mark: {examMark}</p>
     </Grid>
   );
 };

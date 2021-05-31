@@ -11,6 +11,7 @@ const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
+const random = require('random')
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
 const roomModel = require("./models/Rooms");
@@ -989,6 +990,93 @@ app.get("/api/professorSubjects", checkAuthenticated, (req, res) => {
   );
 });
 
+app.post("/api/student/get-exams", checkAuthenticated, (req, res) => {
+  
+})
+
+app.post("/api/student/get-exam", checkAuthenticated, (req, res) => {
+  const { subjectId, level, examId } = req.body
+
+  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === level - 1
+    );
+
+    const docSubject = docLevel.subjects.find(
+      (subject) => subject._id.toString() === subjectId
+    );
+
+    userModel.findOne({ _id: req.user_id }, (err, student) => {
+
+      const studentExam = student.exams.find(exam => exam._id.toString() === examId);
+
+      const examSchema = docSubject.exams.find(exam => exam._id.toString() === examId);
+      const questionBank = docSubject.questionBank;
+
+      if(studentExam){
+        studentExam.examChance--
+        if(studentExam.examChance === 0 || studentExam.done){
+          return {pass: false, examChange: false}
+        }
+      }
+
+      // 3 times chance exam
+      const questions = [];
+
+      examSchema.conditions.map(condition => {
+        const tempQuestions = [];
+        questionBank.questions.find(question => {
+          if(question.difficulty === condition.difficulty && question.chapterNumber === condition.chapter && question.questionType === condition.type){
+            question.userAnswer = []
+            question.correctAnswer = ""
+            tempQuestions.push(question);
+          }
+        })
+  
+        Array(condition.numberOfQuestions).fill(null).map(() => {
+          questions.push(tempQuestions[random.int((min = 0), (max = tempQuestions.length - 1))]);
+        })
+      })
+
+      if(studentExam){
+        studentExam.questions = questions;
+
+        return {pass: true, examChance: true, exam: studentExam}
+      }
+
+
+      const exam = {
+        duration: examSchema.duration,
+        examDate: examSchema.examDate,
+        examEndTime: examSchema.examEndTime,
+        chapters: examSchema.chapters,
+        examName: examSchema.examName,
+        type: examSchema.type,
+        shortEssay: examSchema.shortEssay,
+        longEssay: examSchema.longEssay,
+        ChooseCorrectAnswer: examSchema.ChooseCorrectAnswer,
+        ChooseMultipleCorrectAnswers: examSchema.ChooseMultipleCorrectAnswers,
+        trueOrFalse: examSchema.trueOrFalse,
+        conditions: examSchema.conditions,
+        examMark: examSchema.examMark,
+        subjectName: subject.name,
+        subjectId,
+        examId,
+        done: false,
+        graded: "no",
+        currentMark: 0,
+        examChance: 2,
+        level,
+        questions
+      };
+
+      return res.send({pass: true, examChance: true, exam})
+    })
+})
+})
+
 app.post("/api/professor/get-exam", checkAuthenticated, (req, res) => {
   let { level, subjectId, examId } = req.body;
 
@@ -1071,6 +1159,7 @@ app.post("/api/professor/add-exam", checkAuthenticated, (req, res) => {
       oldExam.ChooseMultipleCorrectAnswers = newExam.ChooseMultipleCorrectAnswers;
       oldExam.trueOrFalse = newExam.trueOrFalse;
       oldExam.conditions = newExam.conditions;
+      oldExam.examMark = newExam.examMark;
     }
     else{
       docSubject.exams.push({

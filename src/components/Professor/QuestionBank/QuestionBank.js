@@ -3,10 +3,12 @@ import {
   Grid,
   Button,
   TextField,
-  Modal
+  Modal,
+  InputAdornment
 } from "@material-ui/core";
 import Axios from 'axios'
 import DisplayedQuestion from "./DisplayedQuestion";
+import { MdSearch } from 'react-icons/md'
 
 const QuestionBank = props => {
 
@@ -22,7 +24,6 @@ const QuestionBank = props => {
       (res) => res.data.pass && setSubject(res.data.subject)
     );
   }, [updateSubject]);
-
 
 
   const confirmHandleChaptersChange = (result) => {
@@ -44,19 +45,86 @@ const QuestionBank = props => {
 
   return (
     <Grid style={{ height: "calc(100vh - 3.5rem)" }}>
-      <TextField
+            <Grid>
+        <Grid
+          style={{
+            position: "relative",
+            width: "fit-content",
+            margin: "0 auto",
+            padding: "0 13px",
+          }}
+        >
+          <p
+            style={{
+              color: "#2C4563",
+              textAlign: "center",
+              fontSize: "35px",
+              font: "normal normal 600 35px/53px Poppins",
+            }}
+          >
+            {subject.name} Question Bank
+          </p>
+          <div
+            style={{
+              position: "absolute",
+              left: "0",
+              bottom: "0",
+              width: "300px",
+              height: "4px",
+              backgroundColor: "#FFE05D",
+            }}
+          ></div>
+        </Grid>
+      </Grid>
+
+      <Grid
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+
+        <Grid style={{display: 'flex', alignItems: "center" }}>
+        <p style={{display: 'inline-block', marginRight: '1rem', color: '#2C4563', font: 'normal normal 600 25px/43px Poppins'}}>Chapter Numbers :</p>
+        <TextField
         onChange={updateChapters}
         name="chapters"
         id="chapters"
         type="number"
-        placeholder="Number of Chapters"
+        variant="outlined"
+        size="small"
+        style={{width: '150px'}}
       />
-      <Button onClick={() => confirmHandleChaptersChange("yes")}>
-        Confirm
-      </Button>
+      {
+        chapters.new < chapters.current && (
+        <Button onClick={() => confirmHandleChaptersChange("yes")}>
+          Confirm
+        </Button>
+        )
+      }
+        </Grid>
+
+        <Grid>
+        <TextField
+            variant="outlined"
+            size="small"
+            placeholder="search level and subject"
+            style={{ width: "30rem" , marginBottom: '2rem'}}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MdSearch color="#7A7A7A" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
       {chapters.new < chapters.current && (
         <Grid>
-          Are you sure you want to lower chapters number ? all questions will be
+          Are you sure you want to lower chapters number? all questions will be
           removed from the removed Chapter
           <Button onClick={() => confirmHandleChaptersChange("no")}>
             Cancel
@@ -64,6 +132,7 @@ const QuestionBank = props => {
         </Grid>
       )}
 
+    <Grid style={{display: 'flex', alignItems: "center", flexDirection: 'column', width : '80%', border: '1px solid #1C60B3', borderRadius: '5px' }}>
       {Array(chapters.current)
         .fill(null)
         .map((value, index) => {
@@ -71,6 +140,8 @@ const QuestionBank = props => {
 
           return <DisplayedQuestion key={index} chapter={chapter} subjectId={subjectId} level={level} setUpdateSubject={setUpdateSubject} subject={subject} setOpen={setOpen} />
         })}
+</Grid>
+        </Grid>
 
         <Modal
         open={open.bool}

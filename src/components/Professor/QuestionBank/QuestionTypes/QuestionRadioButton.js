@@ -26,7 +26,7 @@ const QuestionRadioButton = props => {
 
     return(
         <Grid>
-        <RadioGroup value={correctAnswer} onChange={e => setCorrectAnswer(e.target.value)}>
+        <RadioGroup value={correctAnswer} onChange={e => setCorrectAnswer(e.target.value)} style={buttonDisabled ? {display: 'flex', flexDirection: 'row'} : {}}> 
             {
             answers.map((answer, index) => (
                 <div>

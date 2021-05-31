@@ -9,6 +9,8 @@ import {
   Button,
 } from "@material-ui/core";
 import Condition from "./Condition";
+import { BiPencil } from 'react-icons/bi';
+import { GrClose } from "react-icons/gr";
 
 const Conditions = (props) => {
   const { conditions, setConditions } = props;
@@ -44,7 +46,7 @@ const Conditions = (props) => {
   };
 
   return (
-    <Grid>
+    <Grid style={{width: '100%'}}>
       {conditionState.stateChange && conditionState.type === "delete" && (
         <>
           Condition will be removed
@@ -56,9 +58,8 @@ const Conditions = (props) => {
           </Button>
         </>
       )}
-      Add Condition
       <Condition conditions={conditions} setConditions={setConditions} />
-      Conditions
+      <p style={{font: 'normal normal normal 20px/30px Poppins', color: '#1C60B3', width: '100%', marginTop: '3rem'}}>Conditions</p>
       {conditions.map((condition, index) => {
         if (conditionState.stateChange && conditionState.type === "edit" && index === parseInt(conditionState.id)) {
           return (
@@ -71,16 +72,20 @@ const Conditions = (props) => {
           );
         } else {
           return (
-            <Grid key={index}>
+            <Grid key={index} style={{display: 'flex', position: 'relative', alignItems: 'center'}}>
+              <p style={{width: 'calc(100% - 7%)', font: 'normal normal normal 16px/27px Poppins'}}>
               {condition.numberOfQuestions} Questions of type {condition.type}{" "}
               from Chapter {condition.chapter} of difficulty{" "}
               {condition.difficulty}
-              <Button id={index} onClick={editCondition}>
-                Edit Condition
-              </Button>
-              <Button id={index} onClick={deleteCondition}>
-                Delete Condition
-              </Button>
+              </p>
+              <Grid style={{display: 'flex', position: 'absolute', right: '0', justifyContent: 'space-between', width: '7%'}}>
+                <Grid id={index} onClick={editCondition} style={{cursor: 'pointer'}}>
+                  <BiPencil />
+                </Grid>
+                <Grid id={index} onClick={deleteCondition} style={{cursor: 'pointer'}}>
+                  <GrClose />
+                </Grid>
+              </Grid>
             </Grid>
           );
         }

@@ -9,24 +9,24 @@ import {
   Button,
 } from "@material-ui/core";
 
-const Condition = props => {
+const Condition = (props) => {
+  const { conditions, setConditions, conditionIndex, setConditionState } =
+    props;
 
-    const { conditions, setConditions, conditionIndex, setConditionState } = props
-    
   const [chapter, setChapter] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [numberOfQuestions, setNumberofQuestions] = useState("");
 
   useEffect(() => {
-      if(conditionIndex){
-          const condition = conditions[conditionIndex];
-          setChapter(condition.chapter)
-          setQuestionType(condition.type)
-          setDifficulty(condition.difficulty)
-          setNumberofQuestions(condition.numberOfQuestions)
-      }
-  }, [])
+    if (conditionIndex) {
+      const condition = conditions[conditionIndex];
+      setChapter(condition.chapter);
+      setQuestionType(condition.type);
+      setDifficulty(condition.difficulty);
+      setNumberofQuestions(condition.numberOfQuestions);
+    }
+  }, []);
 
   const addCondition = () => {
     const condition = {
@@ -36,23 +36,25 @@ const Condition = props => {
       numberOfQuestions,
     };
 
-    if(conditionIndex){
-        const newConditions = conditions;
-        const index = newConditions.indexOf(conditionIndex);
-        newConditions.splice(index, 1);
-        newConditions.push(condition);
-        setConditions(newConditions);
-        setConditionState({stateChange: false,type: null,id: null})
-
-    }
-    else{
-        setConditions([...conditions, condition]);
+    if (conditionIndex) {
+      const newConditions = conditions;
+      const index = newConditions.indexOf(conditionIndex);
+      newConditions.splice(index, 1);
+      newConditions.push(condition);
+      setConditions(newConditions);
+      setConditionState({ stateChange: false, type: null, id: null });
+    } else {
+      setConditions([...conditions, condition]);
     }
   };
 
-    return(
-        <Grid>
-              <FormControl style={{ width: "10rem", margin: "0 1rem" }}>
+  return (
+    <Grid style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+      <FormControl
+        variant="outlined"
+        size="small"
+        style={{ width: "23%", margin: '1.5rem 0' }}
+      >
         <InputLabel>Chapter</InputLabel>
         <Select value={chapter} onChange={(e) => setChapter(e.target.value)}>
           <MenuItem value={1}>Chapter 1</MenuItem>
@@ -60,7 +62,11 @@ const Condition = props => {
           <MenuItem value={3}>Chapter 3</MenuItem>
         </Select>
       </FormControl>
-      <FormControl style={{ width: "10rem", margin: "0 1rem" }}>
+      <FormControl
+        variant="outlined"
+        size="small"
+        style={{ width: "23%", margin: '1.5rem 0' }}
+      >
         <InputLabel>Question Type</InputLabel>
         <Select
           value={questionType}
@@ -77,7 +83,11 @@ const Condition = props => {
           <MenuItem value={"longEssay"}>Long Essay</MenuItem>
         </Select>
       </FormControl>
-      <FormControl style={{ width: "10rem", margin: "0 1rem" }}>
+      <FormControl
+        variant="outlined"
+        size="small"
+        style={{ width: "23%", margin: '1.5rem 0' }}
+      >
         <InputLabel>Difficulty</InputLabel>
         <Select
           value={difficulty}
@@ -89,16 +99,21 @@ const Condition = props => {
         </Select>
       </FormControl>
       <TextField
+        variant="outlined"
+        size="small"
+        style={{ width: "23%", margin: '1.5rem 0' }}
         type="number"
         label="Number of Questions"
         value={numberOfQuestions}
         onChange={(e) => setNumberofQuestions(e.target.value)}
       />
-      <Button variant="contained" color="primary" onClick={addCondition}>
-        Add Condition
-      </Button>
-        </Grid>
-    )
-}
+      <Grid style={{width: '100%', display: 'flex', justifyContent: 'flex-end'}}>
+        <Button variant="contained" color="primary" onClick={addCondition} style={{backgroundColor: '#1C60B3', textTransform: 'none', color: 'white', font: 'normal normal 600 14px/25px Poppins', height: "3rem", width: '10rem'}}>
+          Add Condition
+        </Button>
+      </Grid>
+    </Grid>
+  );
+};
 
-export default Condition
+export default Condition;

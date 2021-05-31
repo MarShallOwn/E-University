@@ -113,7 +113,11 @@ const ExamSchema = new Schema({
         type: Number,
         required: true
     }, 
-    conditions: [ConditionSchema]
+    conditions: [ConditionSchema],
+    examMark: {
+        type: Number,
+        required: true
+    },
 })
 
 const mediaSchema = new Schema({

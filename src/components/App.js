@@ -36,6 +36,7 @@ import AdminDeleteUser from "./Admin/User/DeleteUser";
 import QuestionBank from "./Professor/QuestionBank/QuestionBank";
 import ProfExam from "./Professor/Exam/Exam"
 import ExamsList from "./Professor/Exam/ExamsList"
+import Error404 from './Error404'
 
 //const history = createBrowserHistory()
 
@@ -53,6 +54,7 @@ const App = () => {
             <Route path="/contact-us" render={ props => <ContactUs {...props} />} />
             <Route path="/colleges" render={ props => <Colleges {...props} />} />
             <Route path="/admin/create-user" render={ props => <CreateUser {...props} />} />
+            <Route path="/error/404" render={ props => <Error404 {...props} />} />
             <Auth path="/admin/create-faculty"component={CreateFaculty} />
             <Auth path="/admin/faculties-list" component={FacultiesList} />
             <Auth path="/admin/edit-faculty" component={EditFaculty} />
