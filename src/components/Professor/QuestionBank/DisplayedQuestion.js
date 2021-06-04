@@ -147,7 +147,7 @@ const DisplayedQuestion = (props) => {
                         buttonDisabled={true}
                       />
                     )}
-                    {question.type === "trueOrFalse" && (
+                    {question.questionType === "trueOrFalse" && (
                       <TrueOrFalse
                         correctAnswer={question.correctAnswers}
                         setCorrectAnswer={question.setCorrectAnswers}

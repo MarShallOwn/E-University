@@ -75,7 +75,7 @@ const Condition = (props) => {
           <MenuItem value={"chooseCorrectAnswer"}>
             Choose Correct Answer
           </MenuItem>
-          <MenuItem value={"chooseMultipleCorrectAnswers"}>
+          <MenuItem value={"multipleAnswers"}>
             Choose Multiple Correct Answers
           </MenuItem>
           <MenuItem value={"trueOrFalse"}>True Or False</MenuItem>

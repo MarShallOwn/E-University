@@ -148,7 +148,7 @@ const Exam = (props) => {
     if(type === "shortEssay") return shortEssay
     if(type === "longEssay") return longEssay
     if(type === "chooseCorrectAnswer") return chooseCorrectAnswer
-    if(type === "chooseMultipleCorrectAnswers") return chooseMultipleCorrectAnswers
+    if(type === "multipleAnswers") return chooseMultipleCorrectAnswers
     if(type === "trueOrFalse") return trueOrFalse
 
     return 0

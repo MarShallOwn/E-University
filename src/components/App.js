@@ -37,6 +37,8 @@ import QuestionBank from "./Professor/QuestionBank/QuestionBank";
 import ProfExam from "./Professor/Exam/Exam"
 import ExamsList from "./Professor/Exam/ExamsList"
 import Error404 from './Error404'
+import StudentExamsList from './Student/Exam/ExamsList'
+import StudentExam from './Student/Exam/Exam'
 
 //const history = createBrowserHistory()
 
@@ -80,6 +82,8 @@ const App = () => {
             <Auth path="/profile" component={Profile} />
             <Auth exact path="/faculty" component={Faculty} />
             <Auth path="/faculty/subject" component={StudentSubject} />
+            <Auth path="/student/exams-list" component={StudentExamsList} />
+            <Auth path="/student/exam" component={StudentExam} />
           </Switch>
         </UserProvider>
     </Router>
