@@ -11,7 +11,7 @@ const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
-const random = require('random')
+const random = require("random");
 const initalizePassport = require("./passport-config");
 const userModel = require("./models/Users");
 const roomModel = require("./models/Rooms");
@@ -69,9 +69,8 @@ cloudinary.config({
 // Profile Images
 const storage = multer.diskStorage({
   filename: (req, file, cb) => {
-    const ext = file.originalname.split(".")[
-      file.originalname.split(".").length - 1
-    ];
+    const ext =
+      file.originalname.split(".")[file.originalname.split(".").length - 1];
     const imageFileName = `${uuidv4()}`;
     cb(null, imageFileName);
   },
@@ -991,61 +990,140 @@ app.get("/api/professorSubjects", checkAuthenticated, (req, res) => {
 });
 
 app.post("/api/student/get-exams", checkAuthenticated, (req, res) => {
-  
-})
+  facultyModel.findOne({ name: req.user.faculty }, (err, faculty) => {
+    if (err) return res.send({ pass: false });
+
+    const docLevel = faculty.levels.find(
+      (level1, index) => index === req.user.level - 1
+    );
+
+    const exams = docLevel.subjects.map((subject) => {
+      const newSubject = {
+        subject: { subjectId: subject._id, subjectName: subject.name },
+        professor: {
+          firstname: subject.professor.firstname,
+          lastname: subject.professor.lastname,
+        },
+        exams: subject.exams,
+      };
+
+      return newSubject;
+    });
+
+    return res.send({ pass: true, exams });
+  });
+});
+
+// shuffle array 
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+};
+
+// return points of question type
+const questionPointsByType = (examSchema, questionType) => {
+  if(questionType === "shortEssay") return examSchema.shortEssay
+  if(questionType === "longEssay") return examSchema.longEssay
+  if(questionType === "multipleAnswers") return examSchema.chooseMultipleCorrectAnswers
+  if(questionType === "chooseCorrectAnswer") return examSchema.chooseCorrectAnswer
+  if(questionType === "trueOrFalse") return examSchema.trueOrFalse
+
+  return null
+}
 
 app.post("/api/student/get-exam", checkAuthenticated, (req, res) => {
-  const { subjectId, level, examId } = req.body
+  const { subjectId, examId } = req.body;
 
   facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
     if (err) return res.send({ pass: false });
 
+    // get level
     const docLevel = faculty.levels.find(
-      (level1, index) => index === level - 1
+      (level1, index) => index === req.user.level - 1
     );
 
+    // get the subject of the exam
     const docSubject = docLevel.subjects.find(
       (subject) => subject._id.toString() === subjectId
     );
 
-    userModel.findOne({ _id: req.user_id }, (err, student) => {
+    // get the user to store the exam in exams attribute
+    userModel.findOne({ _id: req.user._id }, (err, student) => {
+      const studentExam = student.exams.find(
+        (exam) => exam.examId.toString() === examId
+      );
 
-      const studentExam = student.exams.find(exam => exam._id.toString() === examId);
-
-      const examSchema = docSubject.exams.find(exam => exam._id.toString() === examId);
+      const examSchema = docSubject.exams.find(
+        (exam) => exam._id.toString() === examId
+      );
       const questionBank = docSubject.questionBank;
 
-      if(studentExam){
-        studentExam.examChance--
-        if(studentExam.examChance === 0 || studentExam.done){
-          return {pass: false, examChange: false}
+      if (studentExam) {
+        studentExam.examChance--;
+        if (studentExam.examChance <= 0 || studentExam.done) {
+          student.save();
+          return res.send({ pass: true, examChance: false });
         }
       }
 
       // 3 times chance exam
       const questions = [];
+      let tempQuestions = [];
+      const randomQuestionBankQuestionsShuffle = [...questionBank.questions];
+      // the exam that will be sent to the student
+      let sendExam = {};
 
-      examSchema.conditions.map(condition => {
-        const tempQuestions = [];
-        questionBank.questions.find(question => {
-          if(question.difficulty === condition.difficulty && question.chapterNumber === condition.chapter && question.questionType === condition.type){
-            question.userAnswer = []
-            question.correctAnswer = ""
-            tempQuestions.push(question);
+      // Get questions that satisfy the conditions and add them to temp questions
+      examSchema.conditions.map((condition) => {
+        shuffleArray(randomQuestionBankQuestionsShuffle);
+        tempQuestions = [];
+        randomQuestionBankQuestionsShuffle.map((question) => {
+          if (tempQuestions.length < condition.numberOfQuestions) {
+            // check if condition found a question that is equal to the condition
+            if (
+              question.difficulty === condition.difficulty &&
+              question.chapterNumber === condition.chapter &&
+              question.questionType === condition.type
+            ) {
+              question.userAnswer = [];
+              question.correctAnswer = "";
+              //if the question is already in the temp questions then dont add it
+              if (
+                !tempQuestions.find(
+                  (tempQuestion) =>
+                    tempQuestion._id.toString() === question._id.toString()
+                )
+              ) {
+                if(question.questionType === "multipleAnswers"){
+                  let unfrozenQuestion = question.toObject()
+                  unfrozenQuestion.userAnswer = {...question.correctAnswers};
+                  for(const objectKey in unfrozenQuestion.userAnswer){
+                    unfrozenQuestion.userAnswer[objectKey] = false
+                  }
+                  tempQuestions.push(unfrozenQuestion)
+                }
+                else{
+                  tempQuestions.push(question);
+                }
+              }
+            }
           }
-        })
-  
-        Array(condition.numberOfQuestions).fill(null).map(() => {
-          questions.push(tempQuestions[random.int((min = 0), (max = tempQuestions.length - 1))]);
-        })
-      })
+        });
+        questions.push(...tempQuestions);
+      });
 
-      if(studentExam){
+      shuffleArray(questions);
+
+      if (studentExam) {
         studentExam.questions = questions;
-
-        return {pass: true, examChance: true, exam: studentExam}
+        studentExam.studentExamEnter = Date.now();
+        student.save();
+        sendExam = {...studentExam._doc};
+        sendExam.questions.forEach((question) => { delete question.correctAnswers });
+        return res.send({ pass: true, examChance: true, exam: sendExam });
       }
-
 
       const exam = {
         duration: examSchema.duration,
@@ -1056,25 +1134,81 @@ app.post("/api/student/get-exam", checkAuthenticated, (req, res) => {
         type: examSchema.type,
         shortEssay: examSchema.shortEssay,
         longEssay: examSchema.longEssay,
-        ChooseCorrectAnswer: examSchema.ChooseCorrectAnswer,
-        ChooseMultipleCorrectAnswers: examSchema.ChooseMultipleCorrectAnswers,
+        chooseCorrectAnswer: examSchema.chooseCorrectAnswer,
+        chooseMultipleCorrectAnswers: examSchema.chooseMultipleCorrectAnswers,
         trueOrFalse: examSchema.trueOrFalse,
         conditions: examSchema.conditions,
         examMark: examSchema.examMark,
-        subjectName: subject.name,
+        subjectName: docSubject.name,
+        studentExamEnter: Date.now(),
         subjectId,
         examId,
         done: false,
         graded: "no",
         currentMark: 0,
-        examChance: 2,
-        level,
-        questions
+        examChance: 3,
+        level: req.user.level,
+        questions,
       };
 
-      return res.send({pass: true, examChance: true, exam})
+      student.exams.push(exam);
+
+      student.save();
+      sendExam = {...exam};
+      sendExam.questions.forEach((question) => { delete question.correctAnswers });
+      return res.send({ pass: true, examChance: true, exam: sendExam });
+    });
+  });
+});
+
+app.post("/api/student/send-exam", checkAuthenticated, (req, res) => {
+  const { exam } = req.body;
+
+  userModel.findOne({ _id: req.user._id }, (err, student) => {
+    if (err) return res.send({ pass: false });
+    
+    const storedExam = student.exams.find(storedExam => storedExam._id.toString() === exam._id.toString())
+
+    storedExam.done = true;
+    storedExam.graded = true;
+
+    const storedQuestions = storedExam.questions
+
+    exam.questions.forEach(question => {
+
+      const storedQuestion = storedQuestions.find(storedQuestion => storedQuestion._id.toString() === question._id.toString());
+
+      if(question.questionType === "shortEssay" || question.questionType === "longEssay"){
+        storedExam.graded = false;
+        storedQuestion.correct = "pending";
+      }
+
+      if(question.questionType === "multipleAnswers"){
+        if(JSON.stringify(question.userAnswer) === JSON.stringify(storedQuestion.correctAnswers)){
+          storedQuestion.correct = "yes";
+          storedExam.currentMark += storedExam.chooseMultipleCorrectAnswers;
+        }
+        else{
+          storedQuestion.correct = "false";
+        }
+      }
+
+      if(question.questionType === "chooseCorrectAnswer" || question.questionType === "trueOrFalse"){
+        if(question.userAnswer === storedQuestion.correctAnswers){
+          storedQuestion.correct = "yes";
+          if(question.questionType === "chooseCorrectAnswer") storedExam.currentMark += storedExam.chooseCorrectAnswer;
+          if(question.questionType === "trueOrFalse") storedExam.currentMark += storedExam.trueOrFalse;
+        }
+        else{
+          storedQuestion.correct = "false";
+        }
+      }
+
     })
-})
+
+    console.log(storedExam);
+  
+  })
 })
 
 app.post("/api/professor/get-exam", checkAuthenticated, (req, res) => {
@@ -1091,12 +1225,14 @@ app.post("/api/professor/get-exam", checkAuthenticated, (req, res) => {
       (subject) => subject._id.toString() === subjectId
     );
 
-    const exam = docSubject.exams.find(exam => exam._id.toString() === examId);
+    const exam = docSubject.exams.find(
+      (exam) => exam._id.toString() === examId
+    );
 
     faculty.save();
     return res.send({ pass: true, exam });
-})
-})
+  });
+});
 
 app.post("/api/professor/exams-list", checkAuthenticated, (req, res) => {
   let { level, subjectId } = req.body;
@@ -1112,14 +1248,18 @@ app.post("/api/professor/exams-list", checkAuthenticated, (req, res) => {
       (subject) => subject._id.toString() === subjectId
     );
 
-    const chaptersNumber =  docSubject.questionBank.chaptersNumber
+    const chaptersNumber = docSubject.questionBank.chaptersNumber;
 
-    const result = {exams: docSubject.exams, subjectId, level, chaptersNumber}
+    const result = {
+      exams: docSubject.exams,
+      subjectId,
+      level,
+      chaptersNumber,
+    };
 
     return res.send({ pass: true, result });
-})
-})
-
+  });
+});
 
 app.post("/api/professor/add-exam", checkAuthenticated, (req, res) => {
   let { newExam, level, subjectId } = req.body;
@@ -1136,17 +1276,16 @@ app.post("/api/professor/add-exam", checkAuthenticated, (req, res) => {
     );
 
     let isExam = false;
-    const oldExam = docSubject.exams.find(exam => {
-      if(exam._id.toString() === newExam._id){
+    const oldExam = docSubject.exams.find((exam) => {
+      if (exam._id.toString() === newExam._id) {
         isExam = true;
         return true;
-      }
-      else{
+      } else {
         return false;
       }
-    })
+    });
 
-    if(isExam){
+    if (isExam) {
       oldExam.duration = newExam.duration;
       oldExam.examDate = newExam.examDate;
       oldExam.examEndTime = newExam.examEndTime;
@@ -1156,47 +1295,49 @@ app.post("/api/professor/add-exam", checkAuthenticated, (req, res) => {
       oldExam.shortEssay = newExam.shortEssay;
       oldExam.longEssay = newExam.longEssay;
       oldExam.ChooseCorrectAnswer = newExam.ChooseCorrectAnswer;
-      oldExam.ChooseMultipleCorrectAnswers = newExam.ChooseMultipleCorrectAnswers;
+      oldExam.ChooseMultipleCorrectAnswers =
+        newExam.ChooseMultipleCorrectAnswers;
       oldExam.trueOrFalse = newExam.trueOrFalse;
       oldExam.conditions = newExam.conditions;
       oldExam.examMark = newExam.examMark;
-    }
-    else{
+    } else {
+      delete newExam._id;
       docSubject.exams.push({
         ...newExam,
         createdAt: new Date(),
       });
     }
 
-
     faculty.save();
     return res.send({ pass: true });
-})
-})
+  });
+});
 
+app.post(
+  "/api/professor/question-bank/chapters-number",
+  checkAuthenticated,
+  (req, res) => {
+    const { chaptersNumber, subjectId, level } = req.body;
 
-app.post("/api/professor/question-bank/chapters-number", checkAuthenticated, (req, res) => {
+    facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
+      if (err) return res.send({ pass: false });
 
-  const { chaptersNumber, subjectId, level } = req.body;
+      const docLevel = faculty.levels.find(
+        (level1, index) => index === level - 1
+      );
 
-  facultyModel.findOne({ name: req.user.faculty }, async (err, faculty) => {
-    if (err) return res.send({ pass: false });
+      const docSubject = docLevel.subjects.find(
+        (subject) => subject._id.toString() === subjectId
+      );
 
-    const docLevel = faculty.levels.find(
-      (level1, index) => index === level - 1
-    );
+      docSubject.questionBank.chaptersNumber = chaptersNumber;
 
-    const docSubject = docLevel.subjects.find(
-      (subject) => subject._id.toString() === subjectId
-    );
-
-    docSubject.questionBank.chaptersNumber = chaptersNumber
-
-    faculty.save().then(doc => {
-      return res.send({ pass: true })
-    })
-  })
-})
+      faculty.save().then((doc) => {
+        return res.send({ pass: true });
+      });
+    });
+  }
+);
 
 app.post(
   "/api/professor/question-bank/edit-question",
@@ -1222,24 +1363,26 @@ app.post(
 
       const docQuestion = docSubject.questionBank.questions.find(
         (question) => question._id.toString() === newQuestion._id
-      )
-
+      );
 
       // get the file linkes that got deleted to a deletedMediaList
       const deletedMediaList = [];
-      for(let oldMedia of docQuestion.media){
-        if(!newQuestion.oldMedia.find(newMedia => oldMedia === newMedia)){
-          deletedMediaList.push(oldMedia)
+      for (let oldMedia of docQuestion.media) {
+        if (!newQuestion.oldMedia.find((newMedia) => oldMedia === newMedia)) {
+          deletedMediaList.push(oldMedia);
         }
       }
 
       // delete deleted media from cloudinary;
-      for(let deletedMedia of deletedMediaList){
+      for (let deletedMedia of deletedMediaList) {
         const resourceType = {};
-        if(deletedMedia.type !== "image"){
-          resourceType.resource_type = "video"
+        if (deletedMedia.type !== "image") {
+          resourceType.resource_type = "video";
         }
-        await cloudinary.uploader.destroy(deletedMedia.file, deletedMedia.type !== "image" ? {resource_type: "video"}: {});
+        await cloudinary.uploader.destroy(
+          deletedMedia.file,
+          deletedMedia.type !== "image" ? { resource_type: "video" } : {}
+        );
       }
 
       const files = [];
@@ -1248,31 +1391,30 @@ app.post(
       // to store it then to the database
       if (req.files.length !== 0) {
         for (let file of req.files) {
-          const ext = file.originalname.split(".")[
-            file.originalname.split(".").length - 1
-          ];
+          const ext =
+            file.originalname.split(".")[
+              file.originalname.split(".").length - 1
+            ];
 
           let cloudinaryResult;
-          const mediaType = file.mimetype.split("/")[0]
-          
-          try{
-            if(mediaType === "image"){
+          const mediaType = file.mimetype.split("/")[0];
+
+          try {
+            if (mediaType === "image") {
               cloudinaryResult = await cloudinary.uploader.upload(file.path, {
                 folder: "e-university-profile-pictures/question-bank-media",
                 use_filename: true,
               });
-            }
-            else{
+            } else {
               cloudinaryResult = await cloudinary.uploader.upload(file.path, {
                 resource_type: "video",
                 folder: "e-university-profile-pictures/question-bank-media",
                 use_filename: true,
               });
-            }           
-          } catch(err){
+            }
+          } catch (err) {
             console.log(err);
-          } 
-
+          }
 
           files.push({
             type: mediaType,
@@ -1294,15 +1436,12 @@ app.post(
       docQuestion.media = newQuestion.media;
       docQuestion.correctAnswers = newQuestion.correctAnswers;
 
-      faculty.save().then(doc => {
+      faculty.save().then((doc) => {
         return res.send({ pass: true });
       });
-      return res.send({ pass: false });
     });
   }
 );
-
-
 
 /**
  * Add Question to question back of the specific subject
@@ -1335,31 +1474,30 @@ app.post(
       // to store it then to the database
       if (req.files.length !== 0) {
         for (let file of req.files) {
-          const ext = file.originalname.split(".")[
-            file.originalname.split(".").length - 1
-          ];
+          const ext =
+            file.originalname.split(".")[
+              file.originalname.split(".").length - 1
+            ];
 
           let cloudinaryResult;
-          const mediaType = file.mimetype.split("/")[0]
-          
-          try{
-            if(mediaType === "image"){
+          const mediaType = file.mimetype.split("/")[0];
+
+          try {
+            if (mediaType === "image") {
               cloudinaryResult = await cloudinary.uploader.upload(file.path, {
                 folder: "e-university-profile-pictures/question-bank-media",
                 use_filename: true,
               });
-            }
-            else{
+            } else {
               cloudinaryResult = await cloudinary.uploader.upload(file.path, {
                 resource_type: "video",
                 folder: "e-university-profile-pictures/question-bank-media",
                 use_filename: true,
               });
-            }           
-          } catch(err){
+            }
+          } catch (err) {
             console.log(err);
-          } 
-
+          }
 
           files.push({
             type: mediaType,
@@ -1536,9 +1674,10 @@ app.post(
     } = req.body;
 
     if (req.file && JSON.parse(newMaterial).type === "file") {
-      const ext = req.file.originalname.split(".")[
-        req.file.originalname.split(".").length - 1
-      ];
+      const ext =
+        req.file.originalname.split(".")[
+          req.file.originalname.split(".").length - 1
+        ];
       cloudinary.uploader.upload(
         req.file.path,
         ext === "pdf"

@@ -5,6 +5,20 @@ const QuestionCheckBox = props => {
     
     const {answers, setAnswers, correctAnswers, setCorrectAnswers, buttonDisabled } = props
 
+    const addAnswer = e => {
+      // if the target is false then remove it and store only true
+      if(!e.target.checked){
+        const tempCorrectAnswers = {...correctAnswers};
+
+        delete tempCorrectAnswers[e.target.name];
+
+        setCorrectAnswers(tempCorrectAnswers)
+      }
+      else{
+        setCorrectAnswers({...correctAnswers, [e.target.name]: e.target.checked})
+      }
+    }
+
     const removeAnswer = e => {
       let tempAnswers = answers;
       let tempCorrectAnswers = correctAnswers;
@@ -33,7 +47,7 @@ const QuestionCheckBox = props => {
               <Checkbox
               disabled={buttonDisabled}
                   checked={correctAnswers[answer]}
-                onChange={e => setCorrectAnswers({...correctAnswers, [e.target.name]: e.target.checked})}
+                onChange={addAnswer}
                 name={answer}
               />
             }

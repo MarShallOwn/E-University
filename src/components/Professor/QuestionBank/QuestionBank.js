@@ -17,28 +17,37 @@ const QuestionBank = props => {
   const [subject, setSubject] = useState({ questionBank: {questions: []} });
   const [updateSubject, setUpdateSubject] = useState(false)
   const [chapters, setChapters] = useState({ current: 3, new: 3 });
+  const [update, setUpdate] = useState(0);
   const [open, setOpen] = useState({bool: false, questionId: ""});
+
+  console.log(chapters.current)
+  console.log(chapters.new)
 
   useEffect(() => {
     Axios.post("/api/professor/get-subject", { subjectId, level }).then(
-      (res) => res.data.pass && setSubject(res.data.subject)
-    );
+      (res) =>{ 
+        if(res.data.pass){
+        setSubject(res.data.subject)
+        setChapters({current: res.data.subject.questionBank.chaptersNumber,new: res.data.subject.questionBank.chaptersNumber})
+      }
+      });
   }, [updateSubject]);
 
 
   const confirmHandleChaptersChange = (result) => {
     if (result === "yes") {
-      setChapters({ ...chapters, current: chapters.new });
-      Axios.post("/api/professor/question-bank/chapters-number", { chaptersNumber: chapters.new, subjectId, level }).then(res => {})
+      setChapters({ ...chapters, current: parseInt(chapters.new) });
+      Axios.post("/api/professor/question-bank/chapters-number", { chaptersNumber: parseInt(chapters.new), subjectId, level }).then(res => {})
     } else {
-      setChapters({ ...chapters, new: chapters.current });
+      setChapters({ ...chapters, new: parseInt(chapters.current) });
     }
   };
 
   const updateChapters = (e) =>{
+    
     setChapters({ ...chapters, new: parseInt(e.target.value) })
 
-    Axios.post("/api/professor/question-bank/chapters-number", { chaptersNumber: e.target.value, subjectId, level }).then(res => {})
+    Axios.post("/api/professor/question-bank/chapters-number", { chaptersNumber: parseInt(e.target.value), subjectId, level }).then(res => {})
   }
 
 

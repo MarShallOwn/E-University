@@ -11,19 +11,15 @@ const resultSchema = new Schema({
 const ConditionSchema = new Schema({
     chapter: {
         type: Number,
-        required: true
     },
     type: {
         type: String,
-        required: true
     },
     difficulty: {
         type: String,
-        required: true,
     },
     numberOfQuestions: {
         type: Number,
-        required: true
     }
 })
 
@@ -31,32 +27,26 @@ const ConditionSchema = new Schema({
 const mediaSchema = new Schema({
     type: {
         type: String,
-        required: true
     },
     file: String,
     extension: String,
     createdAt: {
         type: Date,
-        required: true
     }
 })
 
 const questionSchema = new Schema({
     questionName: {
         type: String,
-        required: true
     },
     difficulty: {
         type: String,
-        required: true
     },
     chapterNumber: {
         type: Number,
-        required: true
     },
     questionType: {
         type: String,
-        required: true
     },
     answers: Array,
     whoAnswered : {
@@ -67,7 +57,6 @@ const questionSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        required: true
     },
     media: {
         type: [mediaSchema],
@@ -78,7 +67,6 @@ const questionSchema = new Schema({
     userAnswer: {},
     correct: {
         type: String,
-        required: true,
         default: ""
     }
 })
@@ -87,67 +75,55 @@ const questionSchema = new Schema({
 const examSchema = new Schema({
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
     },
     duration: {
         type: String,
-        required: true
     },
     examDate: {
         type: Date,
-        required: true,
     },
     examEndTime: {
         type: Date,
-        required: true,
     },
     chapters: {
         type: Schema.Types.Mixed,
-        required: true
     },
     examName: {
         type: String,
-        required: true
+    },
+    studentExamEnter: {
+        type: Date
     },
     type: {
         type: String,
-        required: true
     },
     shortEssay: {
         type: Number,
-        required: true
     },
     longEssay: {
         type: Number,
-        required: true
     },
     chooseCorrectAnswer: {
         type: Number,
-        required: true
     },
     chooseMultipleCorrectAnswers: {
         type: Number,
-        required: true
     },
     trueOrFalse: {
         type: Number,
-        required: true
     }, 
     conditions: [ConditionSchema],
     examMark: {
         type: Number,
-        required: true
     },
     subjectName: {
         type: String,
-        required: true
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
     },
     examId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
     },
     done: {
         type: Boolean,
@@ -244,6 +220,10 @@ const userSchema = new Schema({
         required: true
     },
     level: Number,
+    exams: {
+        type: [examSchema],
+        default: []
+    },
     resetPasswordToken: {
         type: String,
         required: false
@@ -251,7 +231,7 @@ const userSchema = new Schema({
     resetPasswordExpires: {
         type: Date,
         required: false
-    }
+    },
 })
 
 
